@@ -1,0 +1,12 @@
+services:
+  postgres:
+    container_name: festadosbairrosapi-pg
+    image: bitnami/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRESQL_USERNAME=verboretiro
+      - POSTGRESQL_PASSWORD=festa
+      - POSTGRESQL_DATABASE=festadosbairros
+    volumes:
+      - ./data/pg:/data/postgres

@@ -1,0 +1,95 @@
+// schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+enum Role {
+  ADMIN
+  STALL
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  username  String   @unique
+  password  String
+  role      Role     @default(STALL) // <- novo campo aqui
+  stall     Stall?
+  createdAt DateTime @default(now())
+}
+
+
+model Stall {
+  id          Int           @id @default(autoincrement())
+  name        String
+  userId      Int           @unique
+  user        User          @relation(fields: [userId], references: [id])
+  saleItems   SaleItem[]
+}
+
+model StockItem {
+  id          Int             @id @default(autoincrement())
+  name        String
+  quantity    Int
+  stockIns    StockIn[]
+  stockOuts   StockOut[]
+  createdAt   DateTime        @default(now())
+}
+
+model StockIn {
+  id           Int        @id @default(autoincrement())
+  stockItemId  Int
+  stockItem    StockItem  @relation(fields: [stockItemId], references: [id])
+  quantity     Int
+  date         DateTime   @default(now())
+}
+
+model StockOut {
+  id           Int        @id @default(autoincrement())
+  stockItemId  Int
+  stockItem    StockItem  @relation(fields: [stockItemId], references: [id])
+  quantity     Int
+  date         DateTime   @default(now())
+}
+
+model SaleItem {
+  id         Int      @id @default(autoincrement())
+  name       String
+  price      Float
+  stallId    Int
+  stall      Stall    @relation(fields: [stallId], references: [id])
+  sales      Sale[]
+}
+
+model Sale {
+  id           Int        @id @default(autoincrement())
+  saleItemId   Int
+  saleItem     SaleItem   @relation(fields: [saleItemId], references: [id])
+  quantity     Int
+  total        Float
+  date         DateTime   @default(now())
+}
+
+model Cashier {
+  id        Int       @id @default(autoincrement())
+  name      String
+  username     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  tokenSales TokenSale[]
+}
+
+model TokenSale {
+  id          Int       @id @default(autoincrement())
+  cashierId   Int
+  cashier     Cashier   @relation(fields: [cashierId], references: [id])
+  buyerName   String?   // se quiser registrar o nome de quem comprou as fichas
+  amountPaid  Float     // valor total pago em dinheiro
+  createdAt   DateTime  @default(now())
+}

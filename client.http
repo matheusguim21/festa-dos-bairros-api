@@ -1,0 +1,13 @@
+
+@base_URL = http://localhost:3333
+
+# @name CreateUser
+POST {{base_URL}}/auth/register
+Content-Type: application/json
+
+{
+  "cpf": "19096713044",
+  "usuario":"matheus",
+  "senha": "Matheus1234"
+    
+}
