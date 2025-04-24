@@ -9,7 +9,8 @@ async function main() {
     data: {
       name: "João",
       username: "joao",
-      password: await hash("senha123", 8), // Lembre de usar hash na aplicação real
+      password: await hash("senha123", 8),
+      role: "STALL",
     },
   });
 
@@ -21,7 +22,7 @@ async function main() {
   });
 
   // Produtos à venda
-  const products = await prisma.saleItem.createMany({
+  await prisma.saleItem.createMany({
     data: [
       { name: "Espetinho de Frango", price: 5.0, stallId: stall.id },
       { name: "Espetinho de Carne", price: 6.0, stallId: stall.id },
@@ -40,43 +41,34 @@ async function main() {
     where: { stallId: stall.id },
   });
 
-  // Vendas (valores fictícios)
+  // Vendas
   await prisma.sale.createMany({
     data: [
-      {
-        saleItemId: saleItems[0].id,
-        quantity: 2,
-        total: 10.0,
-        date: new Date(),
-      },
-      {
-        saleItemId: saleItems[1].id,
-        quantity: 1,
-        total: 6.0,
-        date: new Date(),
-      },
-      {
-        saleItemId: saleItems[3].id,
-        quantity: 3,
-        total: 12.0,
-        date: new Date(),
-      },
-      {
-        saleItemId: saleItems[4].id,
-        quantity: 1,
-        total: 3.5,
-        date: new Date(),
-      },
-      {
-        saleItemId: saleItems[6].id,
-        quantity: 4,
-        total: 12.0,
-        date: new Date(),
-      },
+      { saleItemId: saleItems[0].id, quantity: 2, total: 10.0 },
+      { saleItemId: saleItems[1].id, quantity: 1, total: 6.0 },
+      { saleItemId: saleItems[3].id, quantity: 3, total: 12.0 },
+      { saleItemId: saleItems[4].id, quantity: 1, total: 3.5 },
+      { saleItemId: saleItems[6].id, quantity: 4, total: 12.0 },
     ],
   });
 
-  console.log("Seed concluído com sucesso ✅");
+  // Itens de estoque
+  await prisma.stockItem.createMany({
+    data: [
+      { name: "Carne Bovina (kg)", quantity: 20 },
+      { name: "Frango (kg)", quantity: 15 },
+      { name: "Queijo Coalho (pacotes)", quantity: 10 },
+      { name: "Pão de Alho (unid)", quantity: 30 },
+      { name: "Coca-Cola Lata", quantity: 50 },
+      { name: "Guaraná Lata", quantity: 40 },
+      { name: "Refrigerante 600ml", quantity: 25 },
+      { name: "Farinha (kg)", quantity: 5 },
+      { name: "Carvão (sacos)", quantity: 10 },
+      { name: "Água Mineral (garrafas)", quantity: 60 },
+    ],
+  });
+
+  console.log("Seed com produtos, vendas e estoque concluído com sucesso ✅");
 }
 
 main()

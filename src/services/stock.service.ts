@@ -3,25 +3,24 @@ import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
 @Injectable()
-export class ProductsService {
+export class StockService {
   constructor(private prismaService: PrismaService) {}
 
-  async adddSaleItem(item: Prisma.SaleItemCreateInput) {
-    return await this.prismaService.saleItem.create({
-      data: item,
-    });
-  }
-
   async getAll() {
-    return await this.prismaService.saleItem.findMany({
+    return await this.prismaService.stockItem.findMany({
       orderBy: {
         name: "asc",
       },
     });
   }
 
+  async addStockItem(item: Prisma.StockItemCreateInput) {
+    return await this.prismaService.stockItem.create({
+      data: item,
+    });
+  }
   async getAllByName(itemName: string) {
-    return await this.prismaService.saleItem.findMany({
+    return await this.prismaService.stockItem.findMany({
       where: {
         name: itemName,
       },
