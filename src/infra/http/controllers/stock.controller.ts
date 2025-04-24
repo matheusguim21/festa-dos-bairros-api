@@ -11,12 +11,11 @@ const getAllProductsByNameSchema = z.object({
 export class StockController {
   constructor(private stockService: StockService) {}
 
-  @Get("/all")
+  @Get()
   @HttpCode(200)
   async getAllStockItems() {
     try {
       const response = await this.stockService.getAll();
-      console.log("StockItems: ", response);
       return response;
     } catch (error) {
       throw error;

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   // Ordem de exclusão respeitando as FKs
   await prisma.sale.deleteMany();
-  await prisma.saleItem.deleteMany();
+  await prisma.product.deleteMany();
 
   await prisma.stockOut.deleteMany();
   await prisma.stockIn.deleteMany();

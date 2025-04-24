@@ -6,24 +6,26 @@ import { Prisma } from "@prisma/client";
 export class ProductsService {
   constructor(private prismaService: PrismaService) {}
 
-  async adddSaleItem(item: Prisma.SaleItemCreateInput) {
-    return await this.prismaService.saleItem.create({
+  async adddSaleItem(item: Prisma.ProductCreateInput) {
+    return await this.prismaService.product.create({
       data: item,
     });
   }
 
   async getAll() {
-    return await this.prismaService.saleItem.findMany({
+    return await this.prismaService.product.findMany({
       orderBy: {
         name: "asc",
       },
     });
   }
-
-  async getAllByName(itemName: string) {
-    return await this.prismaService.saleItem.findMany({
+  async getAllByName(productName: string) {
+    return await this.prismaService.product.findMany({
       where: {
-        name: itemName,
+        name: {
+          contains: productName,
+          mode: "insensitive",
+        },
       },
       orderBy: {
         name: "asc",

@@ -22,7 +22,7 @@ async function main() {
   });
 
   // Produtos à venda
-  await prisma.saleItem.createMany({
+  await prisma.product.createMany({
     data: [
       { name: "Espetinho de Frango", price: 5.0, stallId: stall.id },
       { name: "Espetinho de Carne", price: 6.0, stallId: stall.id },
@@ -37,18 +37,18 @@ async function main() {
     ],
   });
 
-  const saleItems = await prisma.saleItem.findMany({
+  const products = await prisma.product.findMany({
     where: { stallId: stall.id },
   });
 
   // Vendas
   await prisma.sale.createMany({
     data: [
-      { saleItemId: saleItems[0].id, quantity: 2, total: 10.0 },
-      { saleItemId: saleItems[1].id, quantity: 1, total: 6.0 },
-      { saleItemId: saleItems[3].id, quantity: 3, total: 12.0 },
-      { saleItemId: saleItems[4].id, quantity: 1, total: 3.5 },
-      { saleItemId: saleItems[6].id, quantity: 4, total: 12.0 },
+      { productId: products[0].id, quantity: 2, total: 10.0 },
+      { productId: products[1].id, quantity: 1, total: 6.0 },
+      { productId: products[3].id, quantity: 3, total: 12.0 },
+      { productId: products[4].id, quantity: 1, total: 3.5 },
+      { productId: products[6].id, quantity: 4, total: 12.0 },
     ],
   });
 
