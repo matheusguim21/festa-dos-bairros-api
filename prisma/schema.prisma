@@ -34,12 +34,13 @@ model Stall {
 }
 
 model StockItem {
-  id          Int             @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
   quantity    Int
+  unit        String      // <-- aqui está a nova propriedade
   stockIns    StockIn[]
   stockOuts   StockOut[]
-  createdAt   DateTime        @default(now())
+  createdAt   DateTime    @default(now())
 }
 
 model StockIn {
