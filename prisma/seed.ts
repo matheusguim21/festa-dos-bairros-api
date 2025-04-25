@@ -1,74 +1,115 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Criação do usuário e barraca
-  const user = await prisma.user.create({
-    data: {
+  // Usuários e barracas
+  const usersData = [
+    {
       name: "João",
       username: "joao",
       password: await hash("senha123", 8),
       role: "STALL",
+      stall: {
+        name: "Churrasco do João",
+      },
     },
-  });
-
-  const stall = await prisma.stall.create({
-    data: {
-      name: "Churrasco do João",
-      userId: user.id,
+    {
+      name: "Maria",
+      username: "maria",
+      password: await hash("senha123", 8),
+      role: "STALL",
+      stall: {
+        name: "Doces da Maria",
+      },
     },
-  });
+    {
+      name: "Pedro",
+      username: "pedro",
+      password: await hash("senha123", 8),
+      role: "STALL",
+      stall: {
+        name: "Hamburgueria do Pedro",
+      },
+    },
+  ];
 
-  // Produtos à venda
-  await prisma.product.createMany({
-    data: [
-      { name: "Espetinho de Frango", price: 5.0, stallId: stall.id },
-      { name: "Espetinho de Carne", price: 6.0, stallId: stall.id },
-      { name: "Espetinho de Queijo", price: 4.5, stallId: stall.id },
-      { name: "Coca-Cola Lata", price: 4.0, stallId: stall.id },
-      { name: "Guaraná Lata", price: 3.5, stallId: stall.id },
-      { name: "Água", price: 2.0, stallId: stall.id },
-      { name: "Pão de Alho", price: 3.0, stallId: stall.id },
-      { name: "Churrasquinho de Linguiça", price: 5.5, stallId: stall.id },
-      { name: "Refrigerante 600ml", price: 5.0, stallId: stall.id },
-      { name: "Farofa Extra", price: 1.5, stallId: stall.id },
-    ],
-  });
+  for (const userData of usersData) {
+    const user = await prisma.user.create({
+      data: {
+        name: userData.name,
+        username: userData.username,
+        password: userData.password,
+        role: userData.role as Role,
+      },
+    });
 
-  const products = await prisma.product.findMany({
-    where: { stallId: stall.id },
-  });
+    const stall = await prisma.stall.create({
+      data: {
+        name: userData.stall.name,
+        userId: user.id,
+      },
+    });
 
-  // Vendas
-  await prisma.sale.createMany({
-    data: [
-      { productId: products[0].id, quantity: 2, total: 10.0 },
-      { productId: products[1].id, quantity: 1, total: 6.0 },
-      { productId: products[3].id, quantity: 3, total: 12.0 },
-      { productId: products[4].id, quantity: 1, total: 3.5 },
-      { productId: products[6].id, quantity: 4, total: 12.0 },
-    ],
-  });
+    // Adiciona produtos por barraca
+    const productsByStall = {
+      "Churrasco do João": [
+        { name: "Espetinho de Frango", price: 5.0 },
+        { name: "Espetinho de Carne", price: 6.0 },
+        { name: "Pão de Alho", price: 3.0 },
+        { name: "Farofa Extra", price: 1.5 },
+      ],
+      "Doces da Maria": [
+        { name: "Brigadeiro", price: 2.0 },
+        { name: "Beijinho", price: 2.0 },
+        { name: "Bolo de Pote", price: 6.0 },
+      ],
+      "Hamburgueria do Pedro": [
+        { name: "Hamburguer Simples", price: 10.0 },
+        { name: "Hamburguer Duplo", price: 15.0 },
+        { name: "Batata Frita", price: 7.0 },
+      ],
+    };
 
-  // Itens de estoque
+    await prisma.product.createMany({
+      data: productsByStall[stall.name].map((p) => ({
+        ...p,
+        stallId: stall.id,
+      })),
+    });
+
+    const createdProducts = await prisma.product.findMany({
+      where: { stallId: stall.id },
+    });
+
+    // Vendas simuladas
+    await prisma.sale.createMany({
+      data: createdProducts.slice(0, 3).map((product, i) => ({
+        productId: product.id,
+        quantity: i + 1,
+        total: (i + 1) * product.price,
+      })),
+    });
+  }
+
+  // Itens de estoque com unidade
   await prisma.stockItem.createMany({
     data: [
-      { name: "Carne Bovina (kg)", quantity: 20 },
-      { name: "Frango (kg)", quantity: 15 },
-      { name: "Queijo Coalho (pacotes)", quantity: 10 },
-      { name: "Pão de Alho (unid)", quantity: 30 },
-      { name: "Coca-Cola Lata", quantity: 50 },
-      { name: "Guaraná Lata", quantity: 40 },
-      { name: "Refrigerante 600ml", quantity: 25 },
-      { name: "Farinha (kg)", quantity: 5 },
-      { name: "Carvão (sacos)", quantity: 10 },
-      { name: "Água Mineral (garrafas)", quantity: 60 },
+      { name: "Carne Bovina", quantity: 20, unit: "kg" },
+      { name: "Frango", quantity: 15, unit: "kg" },
+      { name: "Queijo Coalho", quantity: 10, unit: "pacote" },
+      { name: "Pão de Alho", quantity: 30, unit: "unidade" },
+      { name: "Coca-Cola Lata", quantity: 50, unit: "unidade" },
+      { name: "Guaraná Lata", quantity: 40, unit: "unidade" },
+      { name: "Refrigerante 600ml", quantity: 25, unit: "garrafa" },
+      { name: "Farinha", quantity: 5, unit: "kg" },
+      { name: "Carvão", quantity: 10, unit: "saco" },
+      { name: "Água Mineral", quantity: 60, unit: "garrafa" },
     ],
   });
 
-  console.log("Seed com produtos, vendas e estoque concluído com sucesso ✅");
+  console.log("Seed com múltiplas barracas e estoque populado ✅");
 }
 
 main()

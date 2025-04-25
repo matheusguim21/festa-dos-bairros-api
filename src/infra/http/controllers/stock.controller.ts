@@ -1,11 +1,15 @@
 import { StockService } from "@/services/stock.service";
-import { Controller, Get, HttpCode, UsePipes } from "@nestjs/common";
+import { Controller, Get, HttpCode, Query, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { z } from "zod";
 
-const getAllProductsByNameSchema = z.object({
-  productName: z.string(),
+const StockQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().min(1).default(1), // coerce = converte string para número
+  limit: z.coerce.number().min(1).max(100).default(10),
 });
+
+type StockQueryDto = z.infer<typeof StockQuerySchema>;
 
 @Controller("/stock")
 export class StockController {
@@ -13,12 +17,12 @@ export class StockController {
 
   @Get()
   @HttpCode(200)
-  async getAllStockItems() {
-    try {
-      const response = await this.stockService.getAll();
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  @UsePipes(new ZodValidationPipe(StockQuerySchema))
+  async findAll(@Query() query: StockQueryDto) {
+    const { search, page, limit } = query;
+
+    const skip = (page - 1) * limit;
+
+    return this.stockService.findAll({ search, skip, take: limit });
   }
 }

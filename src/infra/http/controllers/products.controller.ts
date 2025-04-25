@@ -1,21 +1,46 @@
 import { ProductsService } from "@/services/products.service";
-import { Controller, Get, Param, UsePipes } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Query,
+  UsePipes,
+} from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 
-const getAllByNameSchema = z.string();
+const getById = z.coerce.number();
 
-@Controller("products")
+const ProductQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().min(1).default(1), // coerce = converte string para número
+  limit: z.coerce.number().min(1).max(100).default(10),
+});
+
+type ProductQueryDTO = z.infer<typeof ProductQuerySchema>;
+@Controller("/products")
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  async getAll() {
-    return await this.productsService.getAll();
+  @HttpCode(200)
+  @UsePipes(new ZodValidationPipe(ProductQuerySchema))
+  async getAll(@Query() query: ProductQueryDTO) {
+    const { limit, page, search } = query;
+
+    const skip = (page - 1) * limit;
+
+    return await this.productsService.findAll({
+      skip,
+      search,
+      take: limit,
+    });
   }
-  @UsePipes(new ZodValidationPipe(getAllByNameSchema))
-  @Get(":productName")
-  async getAllByName(@Param("productName") productName: string) {
-    return await this.productsService.getAllByName(productName);
+
+  @UsePipes(new ZodValidationPipe(getById))
+  @Get(":productId")
+  async getbyId(@Param("productId") productId: number) {
+    return await this.productsService.getbyId(productId);
   }
 }
