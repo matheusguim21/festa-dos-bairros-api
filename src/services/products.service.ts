@@ -1,4 +1,5 @@
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
+import { AddProductRequestDTO } from "@/infra/http/controllers/products.controller";
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
@@ -10,12 +11,6 @@ interface FindAllProductsProps {
 @Injectable()
 export class ProductsService {
   constructor(private prismaService: PrismaService) {}
-
-  async adddSaleItem(item: Prisma.ProductCreateInput) {
-    return await this.prismaService.product.create({
-      data: item,
-    });
-  }
 
   async findAll({ skip, take, search }: FindAllProductsProps) {
     const where: Prisma.ProductWhereInput = search
@@ -48,6 +43,27 @@ export class ProductsService {
   }
   async getbyId(productId: number) {
     return await this.prismaService.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+  }
+  async adddSaleItem(product: AddProductRequestDTO) {
+    const { name, price, stallId } = product;
+
+    const newProduct = await this.prismaService.product.create({
+      data: {
+        name,
+        price,
+        stallId, // Assuming your schema has stallId as a field
+      },
+    });
+
+    return newProduct;
+  }
+
+  async deleteProduct(productId: number) {
+    return await this.prismaService.product.delete({
       where: {
         id: productId,
       },

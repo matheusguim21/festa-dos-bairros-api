@@ -1,3 +1,4 @@
+import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
 import { StallService } from "@/services/stall.service";
 import {
   Controller,
@@ -7,9 +8,11 @@ import {
   Delete,
   Body,
   Param,
+  UseGuards,
 } from "@nestjs/common";
 
 @Controller("/stalls")
+@UseGuards(JWTAuthGuard)
 export class StallController {
   constructor(private readonly stallService: StallService) {}
 

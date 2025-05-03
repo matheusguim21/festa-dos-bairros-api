@@ -1,7 +1,15 @@
 import { StockService } from "@/services/stock.service";
-import { Controller, Get, HttpCode, Query, UsePipes } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Query,
+  UseGuards,
+  UsePipes,
+} from "@nestjs/common";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { z } from "zod";
+import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
 
 const StockQuerySchema = z.object({
   search: z.string().optional(),
@@ -12,6 +20,7 @@ const StockQuerySchema = z.object({
 type StockQueryDto = z.infer<typeof StockQuerySchema>;
 
 @Controller("/stock")
+@UseGuards(JWTAuthGuard)
 export class StockController {
   constructor(private stockService: StockService) {}
 

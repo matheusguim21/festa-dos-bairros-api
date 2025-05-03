@@ -1,14 +1,24 @@
 import { ProductsService } from "@/services/products.service";
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
+  Post,
   Query,
+  Res,
+  UseGuards,
   UsePipes,
 } from "@nestjs/common";
-import { z } from "zod";
+import { number, string, z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
+import { NotFoundError } from "rxjs";
+import { Prisma } from "@prisma/client";
+import { Response } from "express";
+import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
 
 const getById = z.coerce.number();
 
@@ -18,8 +28,19 @@ const ProductQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(10),
 });
 
+const AddProductSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+  stallId: z.number(),
+});
+const deleteProductSchema = z.coerce.number();
+type DeleteProductRequestDTO = z.infer<typeof deleteProductSchema>;
+
 type ProductQueryDTO = z.infer<typeof ProductQuerySchema>;
+
+export type AddProductRequestDTO = z.infer<typeof AddProductSchema>;
 @Controller("/products")
+@UseGuards(JWTAuthGuard)
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
@@ -41,6 +62,50 @@ export class ProductsController {
   @UsePipes(new ZodValidationPipe(getById))
   @Get(":productId")
   async getbyId(@Param("productId") productId: number) {
-    return await this.productsService.getbyId(productId);
+    try {
+      const response = await this.productsService.getbyId(productId);
+      if (response) {
+        return response;
+      }
+      throw new NotFoundException("Produto não encontrado");
+    } catch (error: any) {
+      return error;
+    }
+  }
+
+  @Post()
+  @UsePipes(new ZodValidationPipe(AddProductSchema))
+  async addProduct(@Body() product: AddProductRequestDTO) {
+    try {
+      const response = await this.productsService.adddSaleItem(product);
+      return {
+        message: "Produto adicionado com sucesso",
+        data: response,
+      };
+    } catch (error: any) {
+      return error;
+    }
+  }
+
+  @Delete(":productId")
+  @UsePipes(new ZodValidationPipe(deleteProductSchema))
+  @HttpCode(204)
+  async deleteProductById(
+    @Res({
+      passthrough: true,
+    })
+    res: Response,
+    @Param("productId")
+    productId: DeleteProductRequestDTO
+  ) {
+    try {
+      return await this.productsService.deleteProduct(productId);
+    } catch (error: any) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        res.status(404);
+        return new NotFoundException("Produto inexistente");
+      }
+      return error;
+    }
   }
 }
