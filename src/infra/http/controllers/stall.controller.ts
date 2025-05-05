@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 
 @Controller("/stalls")
-@UseGuards(JWTAuthGuard)
+// @UseGuards(JWTAuthGuard)
 export class StallController {
   constructor(private readonly stallService: StallService) {}
 

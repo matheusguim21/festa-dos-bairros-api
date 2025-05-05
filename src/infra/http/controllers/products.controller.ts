@@ -40,7 +40,7 @@ type ProductQueryDTO = z.infer<typeof ProductQuerySchema>;
 
 export type AddProductRequestDTO = z.infer<typeof AddProductSchema>;
 @Controller("/products")
-@UseGuards(JWTAuthGuard)
+// @UseGuards(JWTAuthGuard)
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
