@@ -34,11 +34,11 @@ export class ProductsService {
     ]);
 
     return {
-      data: products,
+      content: products,
       total,
       page: Math.floor(skip / take),
       limit: take,
-      totalPages: Math.floor(total / take),
+      totalPages: Math.ceil(total / take),
     };
   }
   async getbyId(productId: number) {

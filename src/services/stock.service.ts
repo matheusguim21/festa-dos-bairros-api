@@ -32,7 +32,7 @@ export class StockService {
     ]);
 
     return {
-      data: items,
+      content: items,
       total,
       page: Math.floor(skip / take),
       limit: take,

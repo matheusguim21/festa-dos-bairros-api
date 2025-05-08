@@ -1,120 +1,141 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+const stallsWithProducts = [
+  {
+    name: "Pingo D'água (BEBIDAS)",
+    username: "pingodagua",
+    password: "senha123",
+    products: [
+      { name: "Refrigerante 350 ml", price: 7.0 },
+      { name: "Água mineral 500 ml", price: 2.0 },
+      { name: "Guaracamp 250ml", price: 3.0 },
+      { name: "Coquetel 400ml", price: 8.0 },
+    ],
+  },
+  {
+    name: "Jardim Luana (PASTEL)",
+    username: "jardimluana",
+    password: "senha123",
+    products: [
+      { name: "Camarão", price: 13.0 },
+      { name: "Carne", price: 10.0 },
+      { name: "Frango", price: 10.0 },
+      { name: "Queijo", price: 10.0 },
+      { name: "Pizza", price: 10.0 },
+      { name: "Caldo de cana", price: 5.0 },
+    ],
+  },
+  {
+    name: "Brisa (HAMBURGUER) ",
+    username: "brisa",
+    password: "senha123",
+    products: [
+      { name: "Hamburguer tradicional (x-bacon)", price: 12.0 },
+      { name: "Hamburguer tradicional duplo", price: 18.0 },
+      { name: "Cheddar Melt artesanal", price: 25.0 },
+      { name: "Pancho (pão com linguiça e queijo)", price: 12.0 },
+    ],
+  },
+  {
+    name: "Retiro (BATATA FRITA)",
+    username: "retiro",
+    password: "senha123",
+    products: [
+      { name: "Batata pequena", price: 10.0 },
+      { name: "Batata grande com cheddar e calabresa", price: 20.0 },
+    ],
+  },
+  {
+    name: "Jardim Guaratiba (CALDOS)",
+    username: "jardimguaratiba",
+    password: "senha123",
+    products: [
+      { name: "Caldo de mocotó", price: 16.0 },
+      { name: "Caldo de Aipim com carne seca", price: 16.0 },
+      { name: "Caldo Verde", price: 14.0 },
+      { name: "Canjica", price: 12.0 },
+      { name: "Milho verde", price: 7.0 },
+    ],
+  },
+  {
+    name: "Pedra (JAPA)",
+    username: "pedra",
+    password: "senha123",
+    products: [
+      { name: "Hot filadélfia", price: 20.0 },
+      { name: "Yakisoba frango", price: 15.0 },
+      { name: "Yakisoba carne", price: 18.0 },
+    ],
+  },
+  {
+    name: "Catruz (DOCES)",
+    username: "catruz",
+    password: "senha123",
+    products: [
+      { name: "Banofe", price: 12.0 },
+      { name: "Torta de chocolate", price: 12.0 },
+      { name: "Torta de limão", price: 12.0 },
+      { name: "Pudim", price: 8.0 },
+      { name: "Bolo de cenoura", price: 8.0 },
+      { name: "Bolo de aipim", price: 7.0 },
+      { name: "Bolo de milho", price: 7.0 },
+      { name: "Cuzcuz", price: 7.0 },
+    ],
+  },
+  {
+    name: "5 Marias (CHURRASCO)",
+    username: "5marias",
+    password: "senha123",
+    products: [
+      { name: "Carne", price: 10.0 },
+      { name: "Misto", price: 9.0 },
+      { name: "Frango", price: 8.0 },
+      { name: "Queijo coalho", price: 10.0 },
+      { name: "Salsichão", price: 7.0 },
+    ],
+  },
+  {
+    name: "Cabuís (AÇAÍ)",
+    username: "cabuis",
+    password: "senha123",
+    products: [
+      { name: "Açaí 300ml", price: 12.0 },
+      { name: "Açaí 400ml", price: 14.0 },
+    ],
+  },
+];
+
 async function main() {
-  // Usuários e barracas
-  const usersData = [
-    {
-      name: "João",
-      username: "joao",
-      password: await hash("senha123", 8),
-      role: "STALL",
-      stall: {
-        name: "Churrasco do João",
-      },
-    },
-    {
-      name: "Maria",
-      username: "maria",
-      password: await hash("senha123", 8),
-      role: "STALL",
-      stall: {
-        name: "Doces da Maria",
-      },
-    },
-    {
-      name: "Pedro",
-      username: "pedro",
-      password: await hash("senha123", 8),
-      role: "STALL",
-      stall: {
-        name: "Hamburgueria do Pedro",
-      },
-    },
-  ];
+  for (const stall of stallsWithProducts) {
+    const hashedPassword = await hash(stall.password, 10);
 
-  for (const userData of usersData) {
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
-        name: userData.name,
-        username: userData.username,
-        password: userData.password,
-        role: userData.role as Role,
+        name: stall.name,
+        username: stall.username,
+        password: hashedPassword,
+        role: "STALL",
+        stall: {
+          create: {
+            name: stall.name,
+            products: {
+              create: stall.products,
+            },
+          },
+        },
       },
-    });
-
-    const stall = await prisma.stall.create({
-      data: {
-        name: userData.stall.name,
-        userId: user.id,
-      },
-    });
-
-    // Adiciona produtos por barraca
-    const productsByStall = {
-      "Churrasco do João": [
-        { name: "Espetinho de Frango", price: 5.0 },
-        { name: "Espetinho de Carne", price: 6.0 },
-        { name: "Pão de Alho", price: 3.0 },
-        { name: "Farofa Extra", price: 1.5 },
-      ],
-      "Doces da Maria": [
-        { name: "Brigadeiro", price: 2.0 },
-        { name: "Beijinho", price: 2.0 },
-        { name: "Bolo de Pote", price: 6.0 },
-      ],
-      "Hamburgueria do Pedro": [
-        { name: "Hamburguer Simples", price: 10.0 },
-        { name: "Hamburguer Duplo", price: 15.0 },
-        { name: "Batata Frita", price: 7.0 },
-      ],
-    };
-
-    await prisma.product.createMany({
-      data: productsByStall[stall.name].map((p) => ({
-        ...p,
-        stallId: stall.id,
-      })),
-    });
-
-    const createdProducts = await prisma.product.findMany({
-      where: { stallId: stall.id },
-    });
-
-    // Vendas simuladas
-    await prisma.sale.createMany({
-      data: createdProducts.slice(0, 3).map((product, i) => ({
-        productId: product.id,
-        quantity: i + 1,
-        total: (i + 1) * product.price,
-      })),
     });
   }
 
-  // Itens de estoque com unidade
-  await prisma.stockItem.createMany({
-    data: [
-      { name: "Carne Bovina", quantity: 20, unit: "kg" },
-      { name: "Frango", quantity: 15, unit: "kg" },
-      { name: "Queijo Coalho", quantity: 10, unit: "pacote" },
-      { name: "Pão de Alho", quantity: 30, unit: "unidade" },
-      { name: "Coca-Cola Lata", quantity: 50, unit: "unidade" },
-      { name: "Guaraná Lata", quantity: 40, unit: "unidade" },
-      { name: "Refrigerante 600ml", quantity: 25, unit: "garrafa" },
-      { name: "Farinha", quantity: 5, unit: "kg" },
-      { name: "Carvão", quantity: 10, unit: "saco" },
-      { name: "Água Mineral", quantity: 60, unit: "garrafa" },
-    ],
-  });
-
-  console.log("Seed com múltiplas barracas e estoque populado ✅");
+  console.log("Seed executado com sucesso!");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("Erro ao rodar seed:", e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

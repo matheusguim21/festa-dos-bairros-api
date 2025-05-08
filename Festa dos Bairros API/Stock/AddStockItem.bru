@@ -1,0 +1,24 @@
+meta {
+  name: AddStockItem
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/stock
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token
+  }}
+}
+
+body:json {
+  {
+       "name": "Arrox Branco 5Kg",
+      "quantity": 5,
+      "unit": "kg"
+  }
+}
