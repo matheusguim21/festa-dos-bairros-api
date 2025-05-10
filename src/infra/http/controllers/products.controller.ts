@@ -28,9 +28,10 @@ const ProductQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(10),
 });
 
-const AddProductSchema = z.object({
+const createProductSchema = z.object({
   name: z.string(),
   price: z.number(),
+  quantity: z.number(),
   stallId: z.number(),
 });
 const deleteProductSchema = z.coerce.number();
@@ -38,7 +39,7 @@ type DeleteProductRequestDTO = z.infer<typeof deleteProductSchema>;
 
 type ProductQueryDTO = z.infer<typeof ProductQuerySchema>;
 
-export type AddProductRequestDTO = z.infer<typeof AddProductSchema>;
+export type CreateProductRequest = z.infer<typeof createProductSchema>;
 @Controller("/products")
 // @UseGuards(JWTAuthGuard)
 export class ProductsController {
@@ -74,16 +75,17 @@ export class ProductsController {
   }
 
   @Post()
-  @UsePipes(new ZodValidationPipe(AddProductSchema))
-  async addProduct(@Body() product: AddProductRequestDTO) {
+  @UsePipes(new ZodValidationPipe(createProductSchema))
+  async createProduct(@Body() product: CreateProductRequest) {
     try {
-      const response = await this.productsService.adddSaleItem(product);
+      const response = await this.productsService.createProduct(product);
       return {
         message: "Produto adicionado com sucesso",
         data: response,
       };
     } catch (error: any) {
-      return error;
+      console.error(error);
+      throw error;
     }
   }
 

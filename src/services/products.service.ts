@@ -1,5 +1,5 @@
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
-import { AddProductRequestDTO } from "@/infra/http/controllers/products.controller";
+import { CreateProductRequest } from "@/infra/http/controllers/products.controller";
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
@@ -22,7 +22,7 @@ export class ProductsService {
         }
       : {};
 
-    const [products, total] = await this.prismaService.$transaction([
+    const [products, totalElements] = await this.prismaService.$transaction([
       this.prismaService.product.findMany({
         where,
         skip,
@@ -35,10 +35,10 @@ export class ProductsService {
 
     return {
       content: products,
-      total,
+      totalElements,
       page: Math.floor(skip / take),
       limit: take,
-      totalPages: Math.ceil(total / take),
+      totalPages: Math.ceil(totalElements / take),
     };
   }
   async getbyId(productId: number) {
@@ -48,14 +48,15 @@ export class ProductsService {
       },
     });
   }
-  async adddSaleItem(product: AddProductRequestDTO) {
-    const { name, price, stallId } = product;
+  async createProduct(product: CreateProductRequest) {
+    const { name, price, stallId, quantity } = product;
 
     const newProduct = await this.prismaService.product.create({
       data: {
         name,
         price,
         stallId, // Assuming your schema has stallId as a field
+        quantity,
       },
     });
 
@@ -66,6 +67,17 @@ export class ProductsService {
     return await this.prismaService.product.delete({
       where: {
         id: productId,
+      },
+    });
+  }
+
+  async getByStallId(stallId: number) {
+    return await this.prismaService.product.findMany({
+      where: {
+        stallId,
+      },
+      orderBy: {
+        name: "asc",
       },
     });
   }

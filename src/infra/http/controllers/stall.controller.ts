@@ -9,7 +9,20 @@ import {
   Body,
   Param,
   UseGuards,
+  UsePipes,
 } from "@nestjs/common";
+import { z } from "zod";
+import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+
+const createStallSchema = z.object({
+  stallName: z.string(),
+  stallHolderName: z.string(),
+  username: z.string(),
+  password: z.string(),
+});
+
+export type CreateStallRequest = z.infer<typeof createStallSchema>;
 
 @Controller("/stalls")
 // @UseGuards(JWTAuthGuard)
@@ -35,11 +48,14 @@ export class StallController {
   }
 
   @Post()
-  async create(@Body() createStallDto: any) {
+  @UsePipes(new ZodValidationPipe(createStallSchema))
+  async create(@Body() createStallDto: CreateStallRequest) {
     try {
       return await this.stallService.create(createStallDto);
     } catch (error) {
-      return error;
+      if (error instanceof PrismaClientValidationError) {
+        return { errorMessage: error.message, errorCause: error.stack };
+      }
     }
   }
 

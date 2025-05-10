@@ -122,7 +122,10 @@ async function main() {
           create: {
             name: stall.name,
             products: {
-              create: stall.products,
+              create: stall.products.map((product) => ({
+                ...product,
+                quantity: 100, // valor inicial de estoque
+              })),
             },
           },
         },

@@ -33,40 +33,36 @@ model Stall {
   products   Product[]
 }
 
-model StockItem {
-  id          Int         @id @default(autoincrement())
-  name        String
-  quantity    Int
-  unit        String      // <-- aqui está a nova propriedade
-  stockIns    StockIn[]
-  stockOuts   StockOut[]
-  createdAt   DateTime    @default(now())
-}
-
 model StockIn {
-  id           Int        @id @default(autoincrement())
-  stockItemId  Int
-  stockItem    StockItem  @relation(fields: [stockItemId], references: [id])
-  quantity     Int
-  date         DateTime   @default(now())
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  date       DateTime @default(now())
 }
 
 model StockOut {
-  id           Int        @id @default(autoincrement())
-  stockItemId  Int
-  stockItem    StockItem  @relation(fields: [stockItemId], references: [id])
-  quantity     Int
-  date         DateTime   @default(now())
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  date       DateTime @default(now())
 }
 
+
 model Product {
-  id         Int      @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
   name       String
   price      Float
-  stallId    Int
-  stall      Stall    @relation(fields: [stallId], references: [id])
+  quantity   Int         @default(0) // quantidade atual em estoque
+  stallId    Int  
+  stall      Stall       @relation(fields: [stallId], references: [id])
   sales      Sale[]
+  stockIns   StockIn[]
+  stockOuts  StockOut[]
+  createdAt  DateTime    @default(now())
 }
+
 
 model Sale {
   id           Int        @id @default(autoincrement())

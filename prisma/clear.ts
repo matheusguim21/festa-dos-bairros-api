@@ -9,7 +9,6 @@ async function main() {
 
   await prisma.stockOut.deleteMany();
   await prisma.stockIn.deleteMany();
-  await prisma.stockItem.deleteMany();
 
   await prisma.tokenSale.deleteMany();
   await prisma.cashier.deleteMany();
