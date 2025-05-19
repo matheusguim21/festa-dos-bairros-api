@@ -49,15 +49,8 @@ export class ProductsService {
     });
   }
   async createProduct(product: CreateProductRequest) {
-    const { name, price, stallId, quantity } = product;
-
     const newProduct = await this.prismaService.product.create({
-      data: {
-        name,
-        price,
-        stallId, // Assuming your schema has stallId as a field
-        quantity,
-      },
+      data: product,
     });
 
     return newProduct;
@@ -71,14 +64,40 @@ export class ProductsService {
     });
   }
 
-  async getByStallId(stallId: number) {
-    return await this.prismaService.product.findMany({
-      where: {
-        stallId,
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
+  async findAllByStallId(
+    stallId: number,
+    { skip, take, search }: FindAllProductsProps
+  ) {
+    const where: Prisma.ProductWhereInput = search
+      ? {
+          name: {
+            contains: search,
+            mode: Prisma.QueryMode.insensitive,
+          },
+          stallId, // Prisma permite isso diretamente
+        }
+      : {
+          stallId,
+        };
+
+    const findManyArgs: Prisma.ProductFindManyArgs = {
+      where,
+      orderBy: { name: "asc" },
+      ...(typeof skip === "number" ? { skip } : {}),
+      ...(typeof take === "number" ? { take } : {}),
+    };
+
+    const [products, totalElements] = await this.prismaService.$transaction([
+      this.prismaService.product.findMany(findManyArgs),
+      this.prismaService.product.count({ where }),
+    ]);
+
+    return {
+      content: products,
+      totalElements,
+      page: skip && take ? Math.floor(skip / take) : 0,
+      limit: take ?? totalElements,
+      totalPages: take ? Math.ceil(totalElements / take) : 1,
+    };
   }
 }

@@ -2,11 +2,13 @@ import { ProductsService } from "@/services/products.service";
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Res,
@@ -35,6 +37,7 @@ const createProductSchema = z.object({
   stallId: z.number(),
 });
 const deleteProductSchema = z.coerce.number();
+
 type DeleteProductRequestDTO = z.infer<typeof deleteProductSchema>;
 
 type ProductQueryDTO = z.infer<typeof ProductQuerySchema>;
@@ -109,5 +112,22 @@ export class ProductsController {
       }
       return error;
     }
+  }
+
+  @Get("stall/:stallId/")
+  @HttpCode(200)
+  async getAllByStallID(
+    @Param("stallId") stallId: string,
+    @Query(new ZodValidationPipe(ProductQuerySchema)) query: ProductQueryDTO
+  ) {
+    const { limit, page, search } = query;
+
+    const skip = (page - 1) * limit;
+
+    return await this.productsService.findAllByStallId(Number(stallId), {
+      skip,
+      search,
+      take: limit,
+    });
   }
 }

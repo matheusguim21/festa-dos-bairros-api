@@ -31,6 +31,8 @@ model Stall {
   userId      Int           @unique
   user        User          @relation(fields: [userId], references: [id])
   products   Product[]
+
+  Order Order[]
 }
 
 model StockIn {
@@ -57,20 +59,39 @@ model Product {
   quantity   Int         @default(0) // quantidade atual em estoque
   stallId    Int  
   stall      Stall       @relation(fields: [stallId], references: [id])
-  sales      Sale[]
+  sales      Role[]
   stockIns   StockIn[]
   stockOuts  StockOut[]
   createdAt  DateTime    @default(now())
+
+  OrderItem OrderItem[]
+}
+enum OrderStatus {
+  PENDING
+  DELIVERED
+  CANCELED
 }
 
+model Order {
+  id         Int          @id @default(autoincrement())
+  stallId    Int
+  stall      Stall        @relation(fields: [stallId], references: [id])
+  buyerName  String?
+  total      Float
+  date       DateTime     @default(now())
+  status     OrderStatus  @default(PENDING)
+  items      OrderItem[]
+}
 
-model Sale {
-  id           Int        @id @default(autoincrement())
-  productId   Int
-  product     Product   @relation(fields: [productId], references: [id])
-  quantity     Int
-  total        Float
-  date         DateTime   @default(now())
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Float
+  lineTotal Float
 }
 
 model Cashier {

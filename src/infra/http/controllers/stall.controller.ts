@@ -14,6 +14,7 @@ import {
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { Prisma, Stall } from "@prisma/client";
 
 const createStallSchema = z.object({
   stallName: z.string(),
@@ -30,18 +31,19 @@ export class StallController {
   constructor(private readonly stallService: StallService) {}
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<Stall[]> {
     try {
-      return await this.stallService.getAll();
+      const response = await this.stallService.getAll();
+      return response;
     } catch (error) {
       return error;
     }
   }
 
-  @Get(":id")
-  async findOne(@Param("id") id: string) {
+  @Get("/user/:id")
+  async findOneByUserId(@Param("id") id: string): Promise<Stall | null> {
     try {
-      return await this.stallService.getById(Number(id));
+      return await this.stallService.getByUserId(Number(id));
     } catch (error) {
       return error;
     }

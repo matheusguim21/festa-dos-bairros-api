@@ -28,6 +28,13 @@ export class UserService {
       where: {
         id: userId,
       },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        stall: true,
+        username: true,
+      },
     });
   }
 }

@@ -66,7 +66,7 @@ export class AuthenticationService {
     });
 
     if (!userExists) {
-      throw new UnauthorizedException("Usuário ou senha inválidos");
+      throw new BadRequestException("Usuário ou senha inválidos");
     }
 
     const doesPasswordMatches = await compare(
@@ -74,7 +74,7 @@ export class AuthenticationService {
       userExists.password!
     );
     if (!doesPasswordMatches) {
-      throw new UnauthorizedException("Usuário ou senha inválidos");
+      throw new BadRequestException("Usuário ou senha inválidos");
     }
 
     return userExists;

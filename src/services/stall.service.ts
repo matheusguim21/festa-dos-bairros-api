@@ -20,9 +20,11 @@ export class StallService {
     });
   }
 
-  async getById(id: number) {
+  async getByUserId(id: number) {
     return this.prismaService.stall.findUnique({
-      where: { id },
+      where: {
+        userId: id,
+      },
     });
   }
 
