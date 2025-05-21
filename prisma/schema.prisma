@@ -30,14 +30,14 @@ model User {
   username  String   @unique
   password  String
   role      Role     @default(STALL_SELLER)
-  stall     Stall?   // Stall é opcional, e só será atribuído via regra de negócio
+  stallId   Int?                     // 🔸 FK opcional
+  stall     Stall?   @relation(fields: [stallId], references: [id])
   createdAt DateTime @default(now())
 }
 model Stall {
   id        Int      @id @default(autoincrement())
   name      String
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
+  users     User[]                    // 🔸 1:N relação reversa
   products  Product[]
   orders    Order[]
 }

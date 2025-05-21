@@ -9,13 +9,27 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
+import { StallService } from "./stall.service";
 
 @Injectable()
 export class OrderService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private stallService: StallService
+  ) {}
 
   async findAllOrders() {
     return await this.prismaService.order.findMany({
+      orderBy: {
+        date: "desc",
+      },
+    });
+  }
+  async findAllOrdersByStallId(stallId: number) {
+    return await this.prismaService.order.findMany({
+      where: {
+        stallId,
+      },
       orderBy: {
         date: "desc",
       },
@@ -25,6 +39,11 @@ export class OrderService {
   async createOrder(data: CreateOrderDto) {
     const { items, stallId, buyerName } = data;
 
+    const stall = await this.stallService.stallExists(stallId);
+
+    if (!stall) {
+      throw new NotFoundException("Barraca não encontrada");
+    }
     const productsIds = items.map((item) => item.productId);
     const products = await this.prismaService.product.findMany({
       where: {

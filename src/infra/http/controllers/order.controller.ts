@@ -8,6 +8,8 @@ import {
   ParseIntPipe,
   UsePipes,
   Res,
+  Get,
+  HttpCode,
 } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
@@ -37,6 +39,25 @@ export type CreateOrderDto = z.infer<typeof CreateOrderSchema>;
 export class OrdersController {
   constructor(private readonly ordersService: OrderService) {}
 
+  @Get()
+  @HttpCode(200)
+  async getAllOrders() {
+    try {
+      return await this.ordersService.findAllOrders();
+    } catch (error: any) {
+      throw error;
+    }
+  }
+  @Get("/:stallId")
+  @HttpCode(200)
+  async getAllOrdersByStallId(@Param("stallId", ParseIntPipe) stallId: number) {
+    try {
+      return await this.ordersService.findAllOrdersByStallId(stallId);
+    } catch (error: any) {
+      throw error;
+    }
+  }
+
   @Post()
   @UsePipes(new ZodValidationPipe(CreateOrderSchema))
   async create(@Body() data: CreateOrderDto, @Res() response: Response) {
@@ -49,7 +70,6 @@ export class OrdersController {
         status: order.status,
       });
     } catch (error: any) {
-      console.error("Erro Order Controller Create Order: ", error);
       throw error;
     }
   }

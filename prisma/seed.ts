@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -117,14 +117,14 @@ async function main() {
         name: stall.name,
         username: stall.username,
         password: hashedPassword,
-        role: "STALL",
+        role: Role.STALL_SELLER, // ✅ Enum seguro
         stall: {
           create: {
             name: stall.name,
             products: {
               create: stall.products.map((product) => ({
                 ...product,
-                quantity: 10, // valor inicial de estoque
+                quantity: 10, // estoque inicial
               })),
             },
           },
@@ -133,7 +133,7 @@ async function main() {
     });
   }
 
-  console.log("Seed executado com sucesso!");
+  console.log("🌱 Seed executado com sucesso!");
 }
 
 main()

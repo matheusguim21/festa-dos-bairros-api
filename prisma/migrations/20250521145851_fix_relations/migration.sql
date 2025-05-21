@@ -1,10 +1,7 @@
-/*
-  Warnings:
+-- ⚠️ Primeiro, remova a coluna que depende do tipo antigo
+ALTER TABLE "Product" DROP COLUMN IF EXISTS "sales";
 
-  - The values [STALL] on the enum `Role` will be removed. If these variants are still used in the database, this will fail.
-  - You are about to drop the column `sales` on the `Product` table. All the data in the column will be lost.
-
-*/
+-- Agora pode atualizar o enum com segurança
 -- AlterEnum
 ALTER TYPE "OrderStatus" ADD VALUE 'PREPARING';
 
@@ -19,8 +16,5 @@ DROP TYPE "Role_old";
 ALTER TABLE "User" ALTER COLUMN "role" SET DEFAULT 'STALL_SELLER';
 COMMIT;
 
--- AlterTable
-ALTER TABLE "Product" DROP COLUMN "sales";
-
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "role" SET DEFAULT 'STALL_SELLER';
+-- (opcional) remover redundância
+-- ALTER TABLE "User" ALTER COLUMN "role" SET DEFAULT 'STALL_SELLER';
