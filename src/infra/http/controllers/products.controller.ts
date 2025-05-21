@@ -117,14 +117,14 @@ export class ProductsController {
   @Get("stall/:stallId/")
   @HttpCode(200)
   async getAllByStallID(
-    @Param("stallId") stallId: string,
+    @Param("stallId", ParseIntPipe) stallId: number,
     @Query(new ZodValidationPipe(ProductQuerySchema)) query: ProductQueryDTO
   ) {
     const { limit, page, search } = query;
 
     const skip = (page - 1) * limit;
 
-    return await this.productsService.findAllByStallId(Number(stallId), {
+    return await this.productsService.findAllByStallId(stallId, {
       skip,
       search,
       take: limit,

@@ -17,10 +17,18 @@ const addStallToUserSchema = z.object({
 });
 
 export type AddStallToUserRequest = z.infer<typeof addStallToUserSchema>;
-@Controller("/user")
+@Controller("/users")
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Get()
+  async getAll() {
+    try {
+      return await this.userService.findAll();
+    } catch (error) {
+      throw error;
+    }
+  }
   @Get("/:userId")
   async getUserById(@Param("userId") userId: number) {
     try {

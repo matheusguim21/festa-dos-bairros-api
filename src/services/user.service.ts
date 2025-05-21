@@ -16,6 +16,14 @@ import { hash } from "bcryptjs";
 export class UserService {
   constructor(private prismaService: PrismaService) {}
 
+  async findAll() {
+    return await this.prismaService.user.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+
   async userExists(username: string) {
     return await this.prismaService.user.findUnique({
       where: {

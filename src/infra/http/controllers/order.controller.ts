@@ -10,11 +10,18 @@ import {
   Res,
   Get,
   HttpCode,
+  Query,
 } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { OrderService } from "@/services/order.service";
 import { Response } from "express";
+
+const OrderQuerySchema = z.object({
+  search: z.string().optional(),
+  page: z.coerce.number().min(1).default(1), // coerce = converte string para número
+  limit: z.coerce.number().min(1).max(100).default(10),
+});
 
 export const CreateOrderItemSchema = z.object({
   productId: z.number().int().positive(),
@@ -31,6 +38,8 @@ export const UpdateOrderStatusSchema = z.object({
   status: z.enum(["PENDING", "DELIVERED", "CANCELED"]),
 });
 
+export type OrderQuerySearch = z.infer<typeof OrderQuerySchema>;
+
 export type UpdateOrderStatusDto = z.infer<typeof UpdateOrderStatusSchema>;
 // Inferência automática de tipos do DTO (opcional)
 export type CreateOrderDto = z.infer<typeof CreateOrderSchema>;
@@ -41,18 +50,37 @@ export class OrdersController {
 
   @Get()
   @HttpCode(200)
-  async getAllOrders() {
+  async getAllOrders(
+    @Query(new ZodValidationPipe(OrderQuerySchema)) query: OrderQuerySearch
+  ) {
     try {
-      return await this.ordersService.findAllOrders();
+      const { limit, page, search } = query;
+      const skip = (page - 1) * limit;
+
+      return await this.ordersService.findAllOrders({
+        skip,
+        take: limit,
+        search,
+      });
     } catch (error: any) {
       throw error;
     }
   }
-  @Get("/:stallId")
+  @Get("/:stallId/")
   @HttpCode(200)
-  async getAllOrdersByStallId(@Param("stallId", ParseIntPipe) stallId: number) {
+  async getAllOrdersByStallId(
+    @Param("stallId", ParseIntPipe) stallId: number,
+    @Query(new ZodValidationPipe(OrderQuerySchema)) query: OrderQuerySearch
+  ) {
     try {
-      return await this.ordersService.findAllOrdersByStallId(stallId);
+      const { limit, page, search } = query;
+      const skip = (page - 1) * limit;
+
+      return await this.ordersService.findAllOrdersByStallId(stallId, {
+        skip,
+        take: limit,
+        search,
+      });
     } catch (error: any) {
       throw error;
     }
