@@ -3,12 +3,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Ordem de exclusão respeitando as FKs
+  // Ordem correta de exclusão respeitando as FKs
+  await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
-  await prisma.product.deleteMany();
 
   await prisma.stockOut.deleteMany();
   await prisma.stockIn.deleteMany();
+
+  await prisma.product.deleteMany();
 
   await prisma.tokenSale.deleteMany();
   await prisma.cashier.deleteMany();
@@ -21,7 +23,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("Erro ao limpar o banco:", e);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());

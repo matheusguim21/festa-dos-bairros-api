@@ -41,7 +41,6 @@ export class AuthenticationController {
   @HttpCode(200)
   @Post("/login")
   async login(@Body() body: LoginRequest) {
-    console.log("body: ", body);
     try {
       const response = await this.authenticationService.authenticateUser(body);
 

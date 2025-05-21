@@ -124,7 +124,7 @@ async function main() {
             products: {
               create: stall.products.map((product) => ({
                 ...product,
-                quantity: 100, // valor inicial de estoque
+                quantity: 10, // valor inicial de estoque
               })),
             },
           },

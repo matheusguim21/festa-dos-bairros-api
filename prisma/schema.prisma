@@ -8,68 +8,51 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+
 enum Role {
   ADMIN
-  STALL
+  STALL_SELLER
+  ORDER_PREPARER
+  CASHIER
 }
 
+enum OrderStatus {
+  PENDING
+  PREPARING
+  DELIVERED
+  CANCELED
+}
 
 model User {
   id        Int      @id @default(autoincrement())
   name      String
   username  String   @unique
   password  String
-  role      Role     @default(STALL) // <- novo campo aqui
-  stall     Stall?
+  role      Role     @default(STALL_SELLER)
+  stall     Stall?   // Stall é opcional, e só será atribuído via regra de negócio
   createdAt DateTime @default(now())
 }
-
-
 model Stall {
-  id          Int           @id @default(autoincrement())
-  name        String
-  userId      Int           @unique
-  user        User          @relation(fields: [userId], references: [id])
-  products   Product[]
-
-  Order Order[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  products  Product[]
+  orders    Order[]
 }
-
-model StockIn {
-  id         Int      @id @default(autoincrement())
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
-  quantity   Int
-  date       DateTime @default(now())
-}
-
-model StockOut {
-  id         Int      @id @default(autoincrement())
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
-  quantity   Int
-  date       DateTime @default(now())
-}
-
 
 model Product {
   id         Int         @id @default(autoincrement())
   name       String
   price      Float
-  quantity   Int         @default(0) // quantidade atual em estoque
-  stallId    Int  
+  quantity   Int         @default(0)
+  stallId    Int
   stall      Stall       @relation(fields: [stallId], references: [id])
-  sales      Role[]
   stockIns   StockIn[]
   stockOuts  StockOut[]
   createdAt  DateTime    @default(now())
-
-  OrderItem OrderItem[]
-}
-enum OrderStatus {
-  PENDING
-  DELIVERED
-  CANCELED
+  orderItems OrderItem[]
 }
 
 model Order {
@@ -94,20 +77,36 @@ model OrderItem {
   lineTotal Float
 }
 
+model StockIn {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  date       DateTime @default(now())
+}
+
+model StockOut {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  date       DateTime @default(now())
+}
+
 model Cashier {
-  id        Int       @id @default(autoincrement())
-  name      String
-  username     String    @unique
-  password  String
-  createdAt DateTime  @default(now())
-  tokenSales TokenSale[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  username    String     @unique
+  password    String
+  createdAt   DateTime   @default(now())
+  tokenSales  TokenSale[]
 }
 
 model TokenSale {
   id          Int       @id @default(autoincrement())
   cashierId   Int
   cashier     Cashier   @relation(fields: [cashierId], references: [id])
-  buyerName   String?   // se quiser registrar o nome de quem comprou as fichas
-  amountPaid  Float     // valor total pago em dinheiro
+  buyerName   String?
+  amountPaid  Float
   createdAt   DateTime  @default(now())
 }

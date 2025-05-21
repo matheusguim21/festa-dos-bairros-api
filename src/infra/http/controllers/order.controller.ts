@@ -7,10 +7,12 @@ import {
   Param,
   ParseIntPipe,
   UsePipes,
+  Res,
 } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { OrderService } from "@/services/order.service";
+import { Response } from "express";
 
 export const CreateOrderItemSchema = z.object({
   productId: z.number().int().positive(),
@@ -37,8 +39,19 @@ export class OrdersController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(CreateOrderSchema))
-  create(@Body() dto: CreateOrderDto) {
-    return this.ordersService.createOrder(dto);
+  async create(@Body() data: CreateOrderDto, @Res() response: Response) {
+    try {
+      const order = await this.ordersService.createOrder(data);
+
+      return response.status(201).send({
+        message: "Pedido criado",
+        orderId: order.id,
+        status: order.status,
+      });
+    } catch (error: any) {
+      console.error("Erro Order Controller Create Order: ", error);
+      throw error;
+    }
   }
 
   @Patch(":id/status")
