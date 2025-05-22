@@ -67,14 +67,8 @@ export class OrderService {
   ) {
     const where: Prisma.OrderWhereInput = search
       ? {
-          items: {
-            some: {
-              product: {
-                name: {
-                  contains: search,
-                },
-              },
-            },
+          buyerName: {
+            contains: search,
           },
           AND: {
             stallId,
@@ -155,6 +149,24 @@ export class OrderService {
           items: { create: orderItemsData },
         },
       }),
+      ...items.map((item) =>
+        this.prismaService.product.update({
+          where: {
+            id: item.productId,
+          },
+          data: {
+            quantity: {
+              decrement: item.quantity,
+            },
+          },
+        })
+      ),
+      this.prismaService.stockOut.createMany({
+        data: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      }),
     ]);
     return order;
   }
@@ -168,6 +180,23 @@ export class OrderService {
     return this.prismaService.order.update({
       where: { id: orderId },
       data: { status: dto.status },
+    });
+  }
+
+  async findAllOrderItemsByOrderId(orderId: number) {
+    return await this.prismaService.orderItem.findMany({
+      where: {
+        orderId,
+      },
+      orderBy: {
+        product: {
+          name: "asc",
+        },
+      },
+      select: {
+        product: true,
+        quantity: true,
+      },
     });
   }
 }
