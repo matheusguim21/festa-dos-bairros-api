@@ -1,5 +1,8 @@
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
-import { CreateProductRequest } from "@/infra/http/controllers/products.controller";
+import {
+  CreateProductRequest,
+  UpdateProductRequest,
+} from "@/infra/http/controllers/products.controller";
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 
@@ -64,6 +67,57 @@ export class ProductsService {
     });
   }
 
+  async updateProduct(data: UpdateProductRequest) {
+    if (data.operation !== "NOONE") {
+      const [product] = await this.prismaService.$transaction([
+        this.prismaService.product.update({
+          data: {
+            name: data.name,
+            price: data.price,
+            quantity:
+              data.operation === "IN"
+                ? {
+                    increment: data.quantity,
+                  }
+                : {
+                    decrement: data.quantity,
+                  },
+            criticalStock: data.criticalStock,
+          },
+          where: {
+            id: data.productId,
+          },
+        }),
+        data.operation === "IN"
+          ? this.prismaService.stockIn.create({
+              data: {
+                quantity: data.quantity!,
+                productId: data.productId,
+                reason: "REPOSIÇÃO DE ESTOQUE",
+              },
+            })
+          : this.prismaService.stockOut.create({
+              data: {
+                quantity: data.quantity!,
+                productId: data.productId,
+                reason: "REPOSIÇÃO DE ESTOQUE",
+              },
+            }),
+      ]);
+      return product;
+    }
+    return await this.prismaService.product.update({
+      data: {
+        name: data.name,
+        price: data.price,
+
+        criticalStock: data.criticalStock,
+      },
+      where: {
+        id: data.productId,
+      },
+    });
+  }
   async findAllByStallId(
     stallId: number,
     { skip, take, search }: FindAllProductsProps

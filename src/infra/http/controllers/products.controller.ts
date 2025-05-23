@@ -10,6 +10,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   Res,
   UseGuards,
@@ -36,7 +37,18 @@ const createProductSchema = z.object({
   quantity: z.number(),
   stallId: z.number(),
 });
+const updateProductSchema = z.object({
+  productId: z.number(),
+  name: z.string().optional(),
+  price: z.number().optional(),
+  quantity: z.number().optional(),
+  criticalStock: z.number().optional(),
+  stallId: z.number().optional(),
+  operation: z.enum(["IN", "OUT", "NOONE"]),
+});
 const deleteProductSchema = z.coerce.number();
+
+export type UpdateProductRequest = z.infer<typeof updateProductSchema>;
 
 type DeleteProductRequestDTO = z.infer<typeof deleteProductSchema>;
 
@@ -88,6 +100,21 @@ export class ProductsController {
       };
     } catch (error: any) {
       console.error(error);
+      throw error;
+    }
+  }
+
+  @Put()
+  @UsePipes(new ZodValidationPipe(updateProductSchema))
+  async updateProducts(@Body() body: UpdateProductRequest) {
+    try {
+      const response = await this.productsService.updateProduct(body);
+
+      return {
+        message: "Produto alterado atualizado com sucesso",
+        content: response,
+      };
+    } catch (error) {
       throw error;
     }
   }
