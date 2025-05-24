@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { StallService } from "./stall.service";
+import { OrdersGateway } from "@/infra/http/gateways/order.gateway";
 
 interface FindAllOrdersProps {
   search?: string;
@@ -21,7 +22,8 @@ interface FindAllOrdersProps {
 export class OrderService {
   constructor(
     private prismaService: PrismaService,
-    private stallService: StallService
+    private stallService: StallService,
+    private orderGateway: OrdersGateway
   ) {}
 
   async findAllOrders({ skip, take, search }: FindAllOrdersProps) {
@@ -169,6 +171,7 @@ export class OrderService {
         })),
       }),
     ]);
+    await this.orderGateway.emitPendingOrders(); // ✅
     return order;
   }
   async updateStatus(orderId: number, dto: UpdateOrderStatusDto) {
