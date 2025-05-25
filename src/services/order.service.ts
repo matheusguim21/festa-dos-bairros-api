@@ -171,7 +171,7 @@ export class OrderService {
         })),
       }),
     ]);
-    await this.orderGateway.emitPendingOrders(); // ✅
+    await this.orderGateway.emitOrders(); // ✅
     return order;
   }
   async updateStatus(orderId: number, dto: UpdateOrderStatusDto) {
@@ -180,7 +180,6 @@ export class OrderService {
       include: { items: true },
     });
     if (!order) throw new NotFoundException("Pedido não encontrado");
-
     if (dto.status === "CANCELED") {
       const productUpdates = order.items.map((item) =>
         this.prismaService.product.update({
@@ -188,18 +187,24 @@ export class OrderService {
           data: { quantity: { increment: item.quantity } },
         })
       );
-      return await this.prismaService.$transaction([
+      const transaction = await this.prismaService.$transaction([
         this.prismaService.order.update({
           where: { id: orderId },
           data: { status: dto.status },
         }),
         ...productUpdates,
       ]);
+      this.orderGateway.emitOrders();
+
+      return transaction;
     }
-    return this.prismaService.order.update({
+    const update = await this.prismaService.order.update({
       where: { id: orderId },
       data: { status: dto.status },
     });
+    this.orderGateway.emitOrders();
+
+    return update;
   }
 
   async findAllOrderItemsByOrderId(orderId: number) {

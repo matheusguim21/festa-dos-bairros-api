@@ -21,29 +21,25 @@ export class OrdersGateway implements OnGatewayConnection {
   constructor(private readonly prisma: PrismaService) {}
 
   async handleConnection(client: Socket) {
-    const pendingOrders = await this.prisma.order.findMany({
-      where: { status: "PENDING" },
-      include: {
-        items: { include: { product: true } },
-      },
-      orderBy: { date: "desc" },
-    });
-
-    // ✅ Envia apenas para o cliente conectado
+    const pendingOrders = await this.getOrders(); // 🔁 reutiliza lógica
     client.emit("orders:pending", pendingOrders);
   }
 
-  async emitPendingOrders() {
-    const pendingOrders = await this.prisma.order.findMany({
-      where: { status: "PENDING" },
+  async emitOrders() {
+    const orders = await this.getOrders();
+    this.server.emit("orders:pending", orders);
+  }
+
+  private async getOrders() {
+    return await this.prisma.order.findMany({
+      where: {
+        OR: [{ status: "PENDING" }, { status: "PREPARING" }],
+      },
       include: {
         items: { include: { product: true } },
       },
-      orderBy: { date: "desc" },
+      orderBy: { date: "asc" },
     });
-
-    // ✅ Envia para todos os clientes conectados
-    this.server.emit("orders:pending", pendingOrders);
   }
 
   @SubscribeMessage("new-order")
