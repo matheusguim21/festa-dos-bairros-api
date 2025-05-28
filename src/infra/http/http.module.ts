@@ -10,6 +10,7 @@ import { ProductsController } from "./controllers/products.controller";
 import { UserController } from "./controllers/user.controller";
 import { OrderService } from "@/services/order.service";
 import { OrdersController } from "./controllers/order.controller";
+import { OrdersGateway } from "./gateways/order.gateway";
 
 @Module({
   controllers: [
@@ -26,6 +27,7 @@ import { OrdersController } from "./controllers/order.controller";
     OrderService,
     ProductsService,
     StallService,
+    OrdersGateway,
   ],
 })
 export class HttpModule {}

@@ -5,6 +5,13 @@ const prisma = new PrismaClient();
 
 const stallsWithProducts = [
   {
+    name: "Matheus",
+    username: "matheus",
+    password: "festa0109",
+    role: "ADMIN",
+  },
+
+  {
     name: "Pingo D'água (BEBIDAS)",
     username: "pingodagua",
     password: "senha123",
@@ -112,24 +119,30 @@ async function main() {
   for (const stall of stallsWithProducts) {
     const hashedPassword = await hash(stall.password, 10);
 
-    await prisma.user.create({
-      data: {
-        name: stall.name,
-        username: stall.username,
-        password: hashedPassword,
-        role: Role.STALL_SELLER, // ✅ Enum seguro
-        stall: {
-          create: {
-            name: stall.name,
-            products: {
-              create: stall.products.map((product) => ({
-                ...product,
-                quantity: 10, // estoque inicial
-              })),
-            },
+    const userData: any = {
+      name: stall.name,
+      username: stall.username,
+      password: hashedPassword,
+      role: stall.role ?? Role.STALL_SELLER,
+    };
+
+    // Verifica se a propriedade "products" existe no objeto
+    if (stall.products) {
+      userData.stall = {
+        create: {
+          name: stall.name,
+          products: {
+            create: stall.products.map((product) => ({
+              ...product,
+              quantity: 10, // estoque inicial
+            })),
           },
         },
-      },
+      };
+    }
+
+    await prisma.user.create({
+      data: userData,
     });
   }
 

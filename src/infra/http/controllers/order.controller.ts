@@ -16,6 +16,7 @@ import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { OrderService } from "@/services/order.service";
 import { Response } from "express";
+import { OrderStatus } from "@prisma/client";
 
 const OrderQuerySchema = z.object({
   search: z.string().optional(),
@@ -35,7 +36,7 @@ export const CreateOrderSchema = z.object({
 });
 
 export const UpdateOrderStatusSchema = z.object({
-  status: z.enum(["PENDING", "DELIVERED", "CANCELED"]),
+  status: z.nativeEnum(OrderStatus),
 });
 
 export type OrderQuerySearch = z.infer<typeof OrderQuerySchema>;
@@ -101,13 +102,26 @@ export class OrdersController {
       throw error;
     }
   }
+  @Get("/items/:orderId")
+  async getOrderItems(@Param("orderId", ParseIntPipe) orderId: number) {
+    try {
+      return await this.ordersService.findAllOrderItemsByOrderId(orderId);
+    } catch (error: any) {
+      throw error;
+    }
+  }
 
-  @Patch(":id/status")
-  @UsePipes(new ZodValidationPipe(UpdateOrderStatusSchema))
+  @Patch("/:id/status")
   updateStatus(
     @Param("id", ParseIntPipe) id: number,
-    @Body() dto: UpdateOrderStatusDto
+    @Body(new ZodValidationPipe(UpdateOrderStatusSchema))
+    dto: UpdateOrderStatusDto
   ) {
-    return this.ordersService.updateStatus(id, dto);
+    try {
+      console.log();
+      return this.ordersService.updateStatus(id, dto);
+    } catch (error) {
+      throw error;
+    }
   }
 }

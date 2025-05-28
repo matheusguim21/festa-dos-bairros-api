@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { StallService } from "./stall.service";
+import { OrdersGateway } from "@/infra/http/gateways/order.gateway";
 
 interface FindAllOrdersProps {
   search?: string;
@@ -21,7 +22,8 @@ interface FindAllOrdersProps {
 export class OrderService {
   constructor(
     private prismaService: PrismaService,
-    private stallService: StallService
+    private stallService: StallService,
+    private orderGateway: OrdersGateway
   ) {}
 
   async findAllOrders({ skip, take, search }: FindAllOrdersProps) {
@@ -67,14 +69,8 @@ export class OrderService {
   ) {
     const where: Prisma.OrderWhereInput = search
       ? {
-          items: {
-            some: {
-              product: {
-                name: {
-                  contains: search,
-                },
-              },
-            },
+          buyerName: {
+            contains: search,
           },
           AND: {
             stallId,
@@ -155,19 +151,76 @@ export class OrderService {
           items: { create: orderItemsData },
         },
       }),
+      ...items.map((item) =>
+        this.prismaService.product.update({
+          where: {
+            id: item.productId,
+          },
+          data: {
+            quantity: {
+              decrement: item.quantity,
+            },
+          },
+        })
+      ),
+      this.prismaService.stockOut.createMany({
+        data: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          reason: "VENDA",
+        })),
+      }),
     ]);
+    await this.orderGateway.emitOrders(); // ✅
     return order;
   }
-
   async updateStatus(orderId: number, dto: UpdateOrderStatusDto) {
     const order = await this.prismaService.order.findUnique({
       where: { id: orderId },
+      include: { items: true },
     });
     if (!order) throw new NotFoundException("Pedido não encontrado");
+    if (dto.status === "CANCELED") {
+      const productUpdates = order.items.map((item) =>
+        this.prismaService.product.update({
+          where: { id: item.productId },
+          data: { quantity: { increment: item.quantity } },
+        })
+      );
+      const transaction = await this.prismaService.$transaction([
+        this.prismaService.order.update({
+          where: { id: orderId },
+          data: { status: dto.status },
+        }),
+        ...productUpdates,
+      ]);
+      this.orderGateway.emitOrders();
 
-    return this.prismaService.order.update({
+      return transaction;
+    }
+    const update = await this.prismaService.order.update({
       where: { id: orderId },
       data: { status: dto.status },
+    });
+    this.orderGateway.emitOrders();
+
+    return update;
+  }
+
+  async findAllOrderItemsByOrderId(orderId: number) {
+    return await this.prismaService.orderItem.findMany({
+      where: {
+        orderId,
+      },
+      orderBy: {
+        product: {
+          name: "asc",
+        },
+      },
+      select: {
+        product: true,
+        quantity: true,
+      },
     });
   }
 }
