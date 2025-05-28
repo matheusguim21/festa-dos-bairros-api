@@ -13,6 +13,7 @@ generator client {
 enum Role {
   ADMIN
   STALL_SELLER
+  STALL_SUPPORT
   ORDER_PREPARER
   CASHIER
 }
