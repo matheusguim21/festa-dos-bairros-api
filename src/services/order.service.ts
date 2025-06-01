@@ -83,9 +83,14 @@ export class OrderService {
     const [orders, totalElements] = await this.prismaService.$transaction([
       this.prismaService.order.findMany({
         where,
-        orderBy: {
-          date: "desc",
-        },
+        orderBy: [
+          {
+            status: "asc",
+          },
+          {
+            date: "asc",
+          },
+        ],
         skip,
         take,
       }),
@@ -171,7 +176,7 @@ export class OrderService {
         })),
       }),
     ]);
-    await this.orderGateway.emitOrders(); // ✅
+    await this.orderGateway.emitOrdersToStall(stallId); // ✅
     return order;
   }
   async updateStatus(orderId: number, dto: UpdateOrderStatusDto) {
@@ -194,7 +199,7 @@ export class OrderService {
         }),
         ...productUpdates,
       ]);
-      this.orderGateway.emitOrders();
+      this.orderGateway.emitOrdersToStall(order.stallId);
 
       return transaction;
     }
@@ -202,7 +207,7 @@ export class OrderService {
       where: { id: orderId },
       data: { status: dto.status },
     });
-    this.orderGateway.emitOrders();
+    this.orderGateway.emitOrdersToStall(order.stallId);
 
     return update;
   }
