@@ -30,6 +30,9 @@ export class ProductsService {
         where,
         skip,
         take,
+        orderBy: {
+          name: "asc",
+        },
       }),
       this.prismaService.product.count({
         where,
