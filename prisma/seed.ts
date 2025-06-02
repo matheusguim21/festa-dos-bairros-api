@@ -7,7 +7,25 @@ const stallsWithProducts = [
   {
     name: "Matheus",
     username: "matheus",
-    password: "festa0109",
+    password: "thata0109",
+    role: "ADMIN",
+  },
+  {
+    name: "Andreia",
+    username: "andreia",
+    password: "amor2804",
+    role: "ADMIN",
+  },
+  {
+    name: "Márcia",
+    username: "marcia",
+    password: "marcia2025",
+    role: "ADMIN",
+  },
+  {
+    name: "Pr. Marcelo",
+    username: "pastor",
+    password: "verboretiro",
     role: "ADMIN",
   },
 
