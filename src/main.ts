@@ -4,9 +4,7 @@ import { ConfigService } from "@nestjs/config";
 import { Env } from "./infra/env";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    // logger: false,
-  });
+  const app = await NestFactory.create(AppModule, {});
 
   const configService: ConfigService<Env, true> = app.get(ConfigService);
 

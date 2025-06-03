@@ -7,25 +7,25 @@ const stallsWithProducts = [
   {
     name: "Matheus",
     username: "matheus",
-    password: "thata0109",
+    password: "admin2025",
     role: "ADMIN",
   },
   {
     name: "Andreia",
     username: "andreia",
-    password: "amor2804",
+    password: "admin2025",
     role: "ADMIN",
   },
   {
     name: "Márcia",
     username: "marcia",
-    password: "marcia2025",
+    password: "admin2025",
     role: "ADMIN",
   },
   {
     name: "Pr. Marcelo",
     username: "pastor",
-    password: "verboretiro",
+    password: "admin2025",
     role: "ADMIN",
   },
 
@@ -141,7 +141,7 @@ async function main() {
       name: stall.name,
       username: stall.username,
       password: hashedPassword,
-      role: stall.role ?? Role.STALL_SELLER,
+      role: stall.role ?? Role.STALL_ADMIN,
     };
 
     // Verifica se a propriedade "products" existe no objeto

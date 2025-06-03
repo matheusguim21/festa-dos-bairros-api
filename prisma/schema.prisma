@@ -16,6 +16,7 @@ enum Role {
   STALL_SUPPORT
   ORDER_PREPARER
   CASHIER
+  STALL_ADMIN
 }
 
 enum OrderStatus {
