@@ -49,6 +49,9 @@ export class OrderService {
         },
         skip,
         take,
+        include: {
+          stall: true,
+        },
       }),
       this.prismaService.order.count({
         where,
@@ -93,6 +96,9 @@ export class OrderService {
         ],
         skip,
         take,
+        include: {
+          stall: true,
+        },
       }),
       this.prismaService.order.count({
         where,
