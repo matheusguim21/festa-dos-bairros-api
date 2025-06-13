@@ -36,6 +36,7 @@ const createProductSchema = z.object({
   price: z.number(),
   quantity: z.number(),
   stallId: z.number(),
+  criticalStock: z.number().optional(),
 });
 const updateProductSchema = z.object({
   productId: z.number(),
