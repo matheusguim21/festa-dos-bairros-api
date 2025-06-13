@@ -11,6 +11,8 @@ import { UserController } from "./controllers/user.controller";
 import { OrderService } from "@/services/order.service";
 import { OrdersController } from "./controllers/order.controller";
 import { OrdersGateway } from "./gateways/order.gateway";
+import { ReportService } from "@/services/reports.service";
+import { ReportController } from "./controllers/reports.controller";
 
 @Module({
   controllers: [
@@ -19,6 +21,7 @@ import { OrdersGateway } from "./gateways/order.gateway";
     ProductsController,
     UserController,
     OrdersController,
+    ReportController,
   ],
   providers: [
     PrismaService,
@@ -28,6 +31,7 @@ import { OrdersGateway } from "./gateways/order.gateway";
     ProductsService,
     StallService,
     OrdersGateway,
+    ReportService,
   ],
 })
 export class HttpModule {}

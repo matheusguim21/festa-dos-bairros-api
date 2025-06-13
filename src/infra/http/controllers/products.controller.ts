@@ -111,7 +111,7 @@ export class ProductsController {
       const response = await this.productsService.updateProduct(body);
 
       return {
-        message: "Produto alterado atualizado com sucesso",
+        message: "Produto  atualizado com sucesso",
         content: response,
       };
     } catch (error) {
