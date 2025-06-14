@@ -9,7 +9,7 @@ export class ReportService {
   constructor(private prisma: PrismaService) {}
 
   async getBestSellingProducts(filters: GetBestSellingProductsFilter) {
-    const { page = 0, limit = 10, search, stallId, sortBy } = filters;
+    const { page, limit, search, stallId, sortBy, skip } = filters;
 
     const where: Prisma.OrderItemWhereInput = {
       order: {
@@ -29,12 +29,12 @@ export class ReportService {
 
     const orderBy =
       sortBy === "revenue"
-        ? { _sum: { lineTotal: "desc" as const } }
-        : { _sum: { quantity: "desc" as const } };
+        ? { _sum: { lineTotal: "desc" as Prisma.SortOrder } }
+        : sortBy === "name"
+        ? { product: { name: "asc" } }
+        : { _sum: { quantity: "desc" as Prisma.SortOrder } };
 
-    const skip = page * limit;
-
-    const [items, allGrouped] = await this.prisma.$transaction([
+    const [items, total, overallUnits] = await this.prisma.$transaction([
       this.prisma.orderItem.groupBy({
         by: ["productId"],
         where,
@@ -46,25 +46,18 @@ export class ReportService {
         skip,
         take: limit,
       }),
-      this.prisma.orderItem.groupBy({
-        by: ["productId"],
+      this.prisma.orderItem.count({ where }),
+
+      // Aqui vem o total de unidades vendidas adaptável
+      this.prisma.orderItem.aggregate({
         where,
         _sum: {
           quantity: true,
-          lineTotal: true,
-        },
-        orderBy: {
-          _sum: {
-            quantity: "desc",
-          },
         },
       }),
     ]);
 
-    const total = allGrouped.length;
-
     const productIds = items.map((i) => i.productId);
-
     const products = await this.prisma.product.findMany({
       where: { id: { in: productIds } },
       include: { stall: true },
@@ -85,11 +78,13 @@ export class ReportService {
     return {
       content: enriched,
       totalElements: total,
-      page,
+      page: Math.floor(skip / limit),
       limit,
       totalPages: Math.ceil(total / limit),
+      totalUnitsSold: overallUnits._sum.quantity || 0, // <- 🔥 Aqui
     };
   }
+
   async getTotalRevenue() {
     const result = await this.prisma.order.aggregate({
       _sum: {
