@@ -16,6 +16,7 @@ interface FindAllOrdersProps {
   search?: string;
   skip: number;
   take: number;
+  stallId?: number;
 }
 
 @Injectable()
@@ -26,91 +27,54 @@ export class OrderService {
     private orderGateway: OrdersGateway
   ) {}
 
-  async findAllOrders({ skip, take, search }: FindAllOrdersProps) {
-    const where: Prisma.OrderWhereInput = search
-      ? {
-          items: {
-            some: {
-              product: {
-                name: {
-                  contains: search,
+  async findAllOrders({ skip, take, search, stallId }: FindAllOrdersProps) {
+    const where: Prisma.OrderWhereInput = {
+      ...(stallId && { stallId }),
+      ...(search &&
+        (stallId
+          ? {
+              buyerName: {
+                contains: search,
+                mode: Prisma.QueryMode.insensitive,
+              },
+            }
+          : {
+              items: {
+                some: {
+                  product: {
+                    name: {
+                      contains: search,
+                      mode: Prisma.QueryMode.insensitive,
+                    },
+                  },
                 },
               },
-            },
-          },
-        }
-      : {};
-
-    const [orders, totalElements] = await this.prismaService.$transaction([
-      this.prismaService.order.findMany({
-        where,
-        orderBy: {
-          date: "desc",
-        },
-        skip,
-        take,
-        include: {
-          stall: true,
-        },
-      }),
-      this.prismaService.order.count({
-        where,
-      }),
-    ]);
-
-    return {
-      content: orders,
-      totalElements,
-      page: Math.floor(skip / take),
-      limit: take,
-      totalPages: Math.ceil(totalElements / take),
+            })),
     };
-  }
-  async findAllOrdersByStallId(
-    stallId: number,
-    { skip, take, search }: FindAllOrdersProps
-  ) {
-    const where: Prisma.OrderWhereInput = search
-      ? {
-          buyerName: {
-            contains: search,
-          },
-          AND: {
-            stallId,
-          },
-        }
-      : {
-          stallId,
-        };
+
+    const orderBy = stallId
+      ? [{ status: "asc" as const }, { date: "asc" as const }]
+      : { date: "desc" as const };
 
     const [orders, totalElements] = await this.prismaService.$transaction([
       this.prismaService.order.findMany({
         where,
-        orderBy: [
-          {
-            status: "asc",
-          },
-          {
-            date: "asc",
-          },
-        ],
+        orderBy,
         skip,
         take,
         include: {
           stall: true,
         },
       }),
-      this.prismaService.order.count({
-        where,
-      }),
+      this.prismaService.order.count({ where }),
     ]);
 
     return {
       content: orders,
       totalElements,
-      page: Math.floor(skip / take),
-      limit: take,
-      totalPages: Math.ceil(totalElements / take),
+      page: skip && take ? Math.floor(skip / take) : 0,
+      limit: take ?? totalElements,
+      totalPages: take ? Math.ceil(totalElements / take) : 1,
     };
   }
 

@@ -22,6 +22,7 @@ const OrderQuerySchema = z.object({
   search: z.string().optional(),
   page: z.coerce.number().min(1).default(1), // coerce = converte string para número
   limit: z.coerce.number().min(1).max(100).default(10),
+  stallId: z.coerce.number().optional(),
 });
 
 export const CreateOrderItemSchema = z.object({
@@ -55,32 +56,14 @@ export class OrdersController {
     @Query(new ZodValidationPipe(OrderQuerySchema)) query: OrderQuerySearch
   ) {
     try {
-      const { limit, page, search } = query;
+      const { limit, page, search, stallId } = query;
       const skip = (page - 1) * limit;
 
       return await this.ordersService.findAllOrders({
         skip,
         take: limit,
         search,
-      });
-    } catch (error: any) {
-      throw error;
-    }
-  }
-  @Get("/:stallId/")
-  @HttpCode(200)
-  async getAllOrdersByStallId(
-    @Param("stallId", ParseIntPipe) stallId: number,
-    @Query(new ZodValidationPipe(OrderQuerySchema)) query: OrderQuerySearch
-  ) {
-    try {
-      const { limit, page, search } = query;
-      const skip = (page - 1) * limit;
-
-      return await this.ordersService.findAllOrdersByStallId(stallId, {
-        skip,
-        take: limit,
-        search,
+        stallId,
       });
     } catch (error: any) {
       throw error;
