@@ -104,44 +104,75 @@ export class ReportService {
       stallId: Number(filters.stallId),
     });
 
+    // 1) Mapear para ROWS compatíveis:
+    const rows = result.content.map((item) => ({
+      Produto: item.name,
+      Barraca: item.stall.name,
+      "Preço Unitário (R$)": item.price,
+      "Unidades Vendidas": item.totalSold,
+      "Receita Total (R$)": item.revenue,
+    }));
+
+    // 2) Definir a schema (com cores só no cabeçalho)
     const schema = [
       {
         column: "Produto",
         type: String,
-        value: (row: any) => row.name,
+        value: (row: any) => row.Produto,
+        width: 30,
+        color: "#ffffff",
+        backgroundColor: "#0070f3",
+        fontWeight: "bold",
       },
       {
         column: "Barraca",
         type: String,
-        value: (row: any) => row.stall.name,
+        value: (row: any) => row.Barraca,
+        backgroundColor: "#f97316",
+        color: "#ffffff",
+        fontWeight: "bold",
       },
       {
         column: "Preço Unitário (R$)",
         type: Number,
+        value: (row: any) => row["Preço Unitário (R$)"],
         format: "#,##0.00",
-        value: (row: any) => row.price,
+        backgroundColor: "#10b981",
+        color: "#ffffff",
+        fontWeight: "bold",
       },
       {
         column: "Unidades Vendidas",
         type: Number,
-        value: (row: any) => row.totalSold,
+        value: (row: any) => row["Unidades Vendidas"],
+        backgroundColor: "#6366f1",
+        color: "#ffffff",
+        fontWeight: "bold",
       },
       {
         column: "Receita Total (R$)",
         type: Number,
+        value: (row: any) => row["Receita Total (R$)"],
         format: "#,##0.00",
-        value: (row: any) => row.revenue,
+        backgroundColor: "#ef4444",
+        color: "#ffffff",
+        fontWeight: "bold",
       },
     ];
 
-    const buffer = await writeXlsxFile(result.content, {
-      schema,
-      buffer: true,
-      sheet: "Mais Vendidos",
-    });
+    // 3) Chamar writeXlsxFile com o array mapeado
+    const buffer = await writeXlsxFile(
+      rows as any,
+      {
+        schema,
+        buffer: true,
+        sheet: "Mais Vendidos",
+      } as any
+    );
 
-    return buffer;
+    return buffer as unknown as Buffer;
   }
+
   async getTotalRevenue() {
     const result = await this.prisma.order.aggregate({
       _sum: {
