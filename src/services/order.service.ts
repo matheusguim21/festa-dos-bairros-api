@@ -53,7 +53,7 @@ export class OrderService {
     };
 
     const orderBy = stallId
-      ? [{ status: "asc" as const }, { date: "asc" as const }]
+      ? [{ status: "desc" as const }, { date: "desc" as const }]
       : { date: "desc" as const };
 
     const [orders, totalElements] = await this.prismaService.$transaction([
