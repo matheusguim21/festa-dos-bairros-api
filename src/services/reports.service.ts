@@ -121,7 +121,6 @@ export class ReportService {
     const headerRow = worksheet.getRow(1);
     headerRow.height = 20;
     headerRow.eachCell((cell, colNumber) => {
-      // Cores por coluna
       let bgColor = "FF0070F3"; // padrão azul
       if (colNumber === 2) bgColor = "FFF97316"; // laranja
       if (colNumber === 3) bgColor = "FF10B981"; // verde
@@ -148,11 +147,36 @@ export class ReportService {
       });
     });
 
-    // Opcional: formatar colunas numéricas
+    // Calcular totais
+    const startRow = 2; // primeira linha de dados
+    const endRow = worksheet.rowCount;
+    const totalUnits = result.content.reduce((sum, r) => sum + r.totalSold, 0);
+    const totalRevenue = result.content.reduce((sum, r) => sum + r.revenue, 0);
+
+    // Linha em branco antes dos totais
+    worksheet.addRow([]);
+    const totalRowNumber = worksheet.rowCount + 1;
+    // Adiciona linha de totais
+    const totalRow = worksheet.addRow({
+      name: "Totais",
+      stall: "",
+      price: "",
+      totalSold: totalUnits,
+      revenue: totalRevenue,
+    });
+    // Mesclar células A até C para o rótulo
+    worksheet.mergeCells(`A${totalRow.number}:C${totalRow.number}`);
+    totalRow.getCell("A").font = { bold: true, size: 12 };
+    totalRow.getCell("D").font = { bold: true, size: 12 };
+    totalRow.getCell("E").font = { bold: true, size: 12 };
+    totalRow.eachCell((cell) => {
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+
+    // Formatar colunas numéricas
     worksheet.getColumn("price").numFmt = "R$ #,##0.00";
     worksheet.getColumn("revenue").numFmt = "R$ #,##0.00";
 
-    // Gerar buffer e retornar
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
   }
