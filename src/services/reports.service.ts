@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 // src/services/report.service.ts
 import writeXlsxFile from "write-excel-file/node";
 import { filter } from "rxjs";
+import { Workbook } from "exceljs";
 @Injectable()
 export class ReportService {
   constructor(private prisma: PrismaService) {}
@@ -104,75 +105,57 @@ export class ReportService {
       stallId: Number(filters.stallId),
     });
 
-    // 1) Mapear para ROWS compatíveis:
-    const rows = result.content.map((item) => ({
-      Produto: item.name,
-      Barraca: item.stall.name,
-      "Preço Unitário (R$)": item.price,
-      "Unidades Vendidas": item.totalSold,
-      "Receita Total (R$)": item.revenue,
-    }));
+    const workbook = new Workbook();
+    const worksheet = workbook.addWorksheet("Mais Vendidos");
 
-    // 2) Definir a schema (com cores só no cabeçalho)
-    const schema = [
-      {
-        column: "Produto",
-        type: String,
-        value: (row: any) => row.Produto,
-        width: 30,
-        color: "#ffffff",
-        backgroundColor: "#0070f3",
-        fontWeight: "bold",
-      },
-      {
-        column: "Barraca",
-        type: String,
-        value: (row: any) => row.Barraca,
-        backgroundColor: "#f97316",
-        color: "#ffffff",
-        fontWeight: "bold",
-      },
-      {
-        column: "Preço Unitário (R$)",
-        type: Number,
-        value: (row: any) => row["Preço Unitário (R$)"],
-        format: "#,##0.00",
-        backgroundColor: "#10b981",
-        color: "#ffffff",
-        fontWeight: "bold",
-      },
-      {
-        column: "Unidades Vendidas",
-        type: Number,
-        value: (row: any) => row["Unidades Vendidas"],
-        backgroundColor: "#6366f1",
-        color: "#ffffff",
-        fontWeight: "bold",
-      },
-      {
-        column: "Receita Total (R$)",
-        type: Number,
-        value: (row: any) => row["Receita Total (R$)"],
-        format: "#,##0.00",
-        backgroundColor: "#ef4444",
-        color: "#ffffff",
-        fontWeight: "bold",
-      },
+    // Definição de colunas e larguras
+    worksheet.columns = [
+      { header: "Produto", key: "name", width: 30 },
+      { header: "Barraca", key: "stall", width: 25 },
+      { header: "Preço Unitário (R$)", key: "price", width: 20 },
+      { header: "Unidades Vendidas", key: "totalSold", width: 20 },
+      { header: "Receita Total (R$)", key: "revenue", width: 20 },
     ];
 
-    // 3) Chamar writeXlsxFile com o array mapeado
-    const buffer = await writeXlsxFile(
-      rows as any,
-      {
-        schema,
-        buffer: true,
-        sheet: "Mais Vendidos",
-      } as any
-    );
+    // Estilizar cabeçalho
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 20;
+    headerRow.eachCell((cell, colNumber) => {
+      // Cores por coluna
+      let bgColor = "FF0070F3"; // padrão azul
+      if (colNumber === 2) bgColor = "FFF97316"; // laranja
+      if (colNumber === 3) bgColor = "FF10B981"; // verde
+      if (colNumber === 4) bgColor = "FF6366F1"; // roxo
+      if (colNumber === 5) bgColor = "FFEF4444"; // vermelho
 
-    return buffer as unknown as Buffer;
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: bgColor },
+      };
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+
+    // Adicionar linhas de dados
+    result.content.forEach((item) => {
+      worksheet.addRow({
+        name: item.name,
+        stall: item.stall.name,
+        price: item.price,
+        totalSold: item.totalSold,
+        revenue: item.revenue,
+      });
+    });
+
+    // Opcional: formatar colunas numéricas
+    worksheet.getColumn("price").numFmt = "R$ #,##0.00";
+    worksheet.getColumn("revenue").numFmt = "R$ #,##0.00";
+
+    // Gerar buffer e retornar
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
-
   async getTotalRevenue() {
     const result = await this.prisma.order.aggregate({
       _sum: {
