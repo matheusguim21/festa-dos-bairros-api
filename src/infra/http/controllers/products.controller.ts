@@ -29,6 +29,7 @@ const ProductQuerySchema = z.object({
   search: z.string().optional(),
   page: z.coerce.number().min(1).default(1), // coerce = converte string para número
   limit: z.coerce.number().min(1).max(100).default(10),
+  stallId: z.coerce.number().optional(),
 });
 
 const createProductSchema = z.object({
@@ -65,14 +66,15 @@ export class ProductsController {
   @HttpCode(200)
   @UsePipes(new ZodValidationPipe(ProductQuerySchema))
   async getAll(@Query() query: ProductQueryDTO) {
-    const { limit, page, search } = query;
+    const { limit, page, search, stallId } = query;
 
     const skip = (page - 1) * limit;
 
-    return await this.productsService.findAll({
+    return await this.productsService.findAllProducts({
       skip,
       search,
       take: limit,
+      stallId,
     });
   }
 
@@ -140,22 +142,5 @@ export class ProductsController {
       }
       return error;
     }
-  }
-
-  @Get("stall/:stallId/")
-  @HttpCode(200)
-  async getAllByStallID(
-    @Param("stallId", ParseIntPipe) stallId: number,
-    @Query(new ZodValidationPipe(ProductQuerySchema)) query: ProductQueryDTO
-  ) {
-    const { limit, page, search } = query;
-
-    const skip = (page - 1) * limit;
-
-    return await this.productsService.findAllByStallId(stallId, {
-      skip,
-      search,
-      take: limit,
-    });
   }
 }

@@ -10,43 +10,45 @@ interface FindAllProductsProps {
   search?: string;
   skip: number;
   take: number;
+  stallId?: number;
 }
 @Injectable()
 export class ProductsService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAll({ skip, take, search }: FindAllProductsProps) {
-    const where: Prisma.ProductWhereInput = search
-      ? {
-          name: {
-            contains: search,
-            mode: Prisma.QueryMode.insensitive,
-          },
-        }
-      : {};
+  async findAllProducts({ skip, take, search, stallId }: FindAllProductsProps) {
+    const where: Prisma.ProductWhereInput = {
+      ...(search && {
+        name: {
+          contains: search,
+          mode: Prisma.QueryMode.insensitive,
+        },
+      }),
+      ...(stallId && { stallId }),
+    };
 
     const [products, totalElements] = await this.prismaService.$transaction([
       this.prismaService.product.findMany({
         where,
         skip,
         take,
+        orderBy: { name: "asc" },
         include: {
           stall: true,
         },
       }),
-      this.prismaService.product.count({
-        where,
-      }),
+      this.prismaService.product.count({ where }),
     ]);
 
     return {
       content: products,
       totalElements,
-      page: Math.floor(skip / take),
-      limit: take,
-      totalPages: Math.ceil(totalElements / take),
+      page: skip && take ? Math.floor(skip / take) : 0,
+      limit: take ?? totalElements,
+      totalPages: take ? Math.ceil(totalElements / take) : 1,
     };
   }
+
   async getbyId(productId: number) {
     return await this.prismaService.product.findUnique({
       where: {
@@ -121,40 +123,40 @@ export class ProductsService {
       },
     });
   }
-  async findAllByStallId(
-    stallId: number,
-    { skip, take, search }: FindAllProductsProps
-  ) {
-    const where: Prisma.ProductWhereInput = search
-      ? {
-          name: {
-            contains: search,
-            mode: Prisma.QueryMode.insensitive,
-          },
-          stallId, // Prisma permite isso diretamente
-        }
-      : {
-          stallId,
-        };
+  // async findAllByStallId(
+  //   stallId: number,
+  //   { skip, take, search }: FindAllProductsProps
+  // ) {
+  //   const where: Prisma.ProductWhereInput = search
+  //     ? {
+  //         name: {
+  //           contains: search,
+  //           mode: Prisma.QueryMode.insensitive,
+  //         },
+  //         stallId, // Prisma permite isso diretamente
+  //       }
+  //     : {
+  //         stallId,
+  //       };
 
-    const findManyArgs: Prisma.ProductFindManyArgs = {
-      where,
-      orderBy: { name: "asc" },
-      ...(typeof skip === "number" ? { skip } : {}),
-      ...(typeof take === "number" ? { take } : {}),
-    };
+  //   const findManyArgs: Prisma.ProductFindManyArgs = {
+  //     where,
+  //     orderBy: { name: "asc" },
+  //     ...(typeof skip === "number" ? { skip } : {}),
+  //     ...(typeof take === "number" ? { take } : {}),
+  //   };
 
-    const [products, totalElements] = await this.prismaService.$transaction([
-      this.prismaService.product.findMany(findManyArgs),
-      this.prismaService.product.count({ where }),
-    ]);
+  //   const [products, totalElements] = await this.prismaService.$transaction([
+  //     this.prismaService.product.findMany(findManyArgs),
+  //     this.prismaService.product.count({ where }),
+  //   ]);
 
-    return {
-      content: products,
-      totalElements,
-      page: skip && take ? Math.floor(skip / take) : 0,
-      limit: take ?? totalElements,
-      totalPages: take ? Math.ceil(totalElements / take) : 1,
-    };
-  }
+  //   return {
+  //     content: products,
+  //     totalElements,
+  //     page: skip && take ? Math.floor(skip / take) : 0,
+  //     limit: take ?? totalElements,
+  //     totalPages: take ? Math.ceil(totalElements / take) : 1,
+  //   };
+  // }
 }
