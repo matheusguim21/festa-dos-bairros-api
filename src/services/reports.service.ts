@@ -11,24 +11,19 @@ export class ReportService {
   constructor(private prisma: PrismaService) {}
 
   async getBestSellingProducts(filters: GetBestSellingProductsFilter) {
-    const { page, limit, search, stallId, sortBy, skip } = filters;
+    // 1) Usa o page enviado e calcula o skip
+    const { page = 0, limit, search, stallId, sortBy } = filters;
+    const skip = page * limit;
 
+    // 2) Monta o filtro common
     const where: Prisma.OrderItemWhereInput = {
-      order: {
-        ...(stallId ? { stallId } : {}),
-      },
+      order: stallId ? { stallId } : {},
       ...(search
-        ? {
-            product: {
-              name: {
-                contains: search,
-                mode: "insensitive",
-              },
-            },
-          }
+        ? { product: { name: { contains: search, mode: "insensitive" } } }
         : {}),
     };
 
+    // 3) Define a ordenação
     const orderBy =
       sortBy === "revenue"
         ? { _sum: { lineTotal: Prisma.SortOrder.desc } }
@@ -36,33 +31,41 @@ export class ReportService {
         ? { product: { name: Prisma.SortOrder.asc } }
         : { _sum: { quantity: Prisma.SortOrder.desc } };
 
-    const [items, total, overallUnits] = await this.prisma.$transaction([
+    // 4) Executa a transação
+    const [items, allDistinct, overallUnits] = await this.prisma.$transaction([
+      // 4a) Pega a página atual
       this.prisma.orderItem.groupBy({
         by: ["productId"],
         where,
-        _sum: {
-          quantity: true,
-          lineTotal: true,
-        },
+        _sum: { quantity: true, lineTotal: true },
         orderBy,
         skip,
         take: limit,
       }),
-      this.prisma.orderItem.count({ where }),
+      // 4b) Conta produtos distintos (sem paginação)
+      this.prisma.orderItem.groupBy({
+        by: ["productId"],
+        where,
+        orderBy: { productId: "asc" },
+      }),
+      // 4c) Soma geral de unidades
       this.prisma.orderItem.aggregate({
         where,
-        _sum: {
-          quantity: true,
-        },
+        _sum: { quantity: true },
       }),
     ]);
 
+    // 5) Constrói totalElements a partir do tamanho de allDistinct
+    const totalProducts = allDistinct.length;
+
+    // 6) Carrega dados dos produtos
     const productIds = items.map((i) => i.productId);
     const products = await this.prisma.product.findMany({
       where: { id: { in: productIds } },
       include: { stall: true },
     });
 
+    // 7) Enriquecimento
     let enriched = items.map((item) => {
       const product = products.find((p) => p.id === item.productId)!;
       return {
@@ -70,26 +73,27 @@ export class ReportService {
         name: product.name,
         stall: product.stall,
         price: product.price,
-        quantity: product.quantity, // estoque
+        quantity: product.quantity,
         criticalStock: product.criticalStock,
         totalSold: item._sum?.quantity || 0,
         revenue: item._sum?.lineTotal || 0,
       };
     });
 
-    // Aplica ordenação manual por estoque se for o caso
+    // 8) Ordenação extra por estoque, se necessário
     if (sortBy === "stock-asc") {
-      enriched = enriched.sort((a, b) => a.quantity - b.quantity);
+      enriched.sort((a, b) => a.quantity - b.quantity);
     } else if (sortBy === "stock-desc") {
-      enriched = enriched.sort((a, b) => b.quantity - a.quantity);
+      enriched.sort((a, b) => b.quantity - a.quantity);
     }
 
+    // 9) Retorno paginado correto
     return {
       content: enriched,
-      totalElements: total,
-      page: Math.floor(skip / limit),
+      totalElements: totalProducts, // produtos distintos
+      page, // usa o page do cliente
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(totalProducts / limit),
       totalUnitsSold: overallUnits._sum.quantity || 0,
     };
   }
