@@ -117,13 +117,7 @@ export class ReportService {
     // Se data fornecida, calcula janela de 18h do dia até 1h da manhã do dia seguinte
     if (filters.date) {
       const day = filters.date; // e.g. "2025-06-10"
-      // antes:
-      // const windowStart = new Date(`${day}T18:00:00`);
-      // const nextDay = new Date(day); nextDay.setDate(...);
-      // const windowEnd   = new Date(`${nextDay}T01:00:00`);
 
-      // depois:
-      // filtro de 18:00 do dia até 05:00 do dia seguinte (horário de São Paulo)
       const windowStart = new Date(`${day}T18:00:00-03:00`);
       const nextDay = new Date(day);
       nextDay.setDate(nextDay.getDate() + 1);
