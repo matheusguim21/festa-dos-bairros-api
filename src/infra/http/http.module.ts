@@ -13,6 +13,8 @@ import { OrdersController } from "./controllers/order.controller";
 import { OrdersGateway } from "./gateways/order.gateway";
 import { ReportService } from "@/services/reports.service";
 import { ReportController } from "./controllers/reports.controller";
+import { ResetPricesController } from "@/services/reset.controller";
+import { ResetPricesService } from "@/services/reset-prices.service";
 
 @Module({
   controllers: [
@@ -22,6 +24,7 @@ import { ReportController } from "./controllers/reports.controller";
     UserController,
     OrdersController,
     ReportController,
+    ResetPricesController,
   ],
   providers: [
     PrismaService,
@@ -32,6 +35,7 @@ import { ReportController } from "./controllers/reports.controller";
     StallService,
     OrdersGateway,
     ReportService,
+    ResetPricesService,
   ],
 })
 export class HttpModule {}

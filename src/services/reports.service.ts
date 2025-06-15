@@ -5,7 +5,6 @@ import { GetBestSellingProductsFilter } from "@/dtos/getBestSellingProducts";
 import { Prisma } from "@prisma/client";
 // src/services/report.service.ts
 import writeXlsxFile from "write-excel-file/node";
-import { filter } from "rxjs";
 import { Workbook } from "exceljs";
 @Injectable()
 export class ReportService {

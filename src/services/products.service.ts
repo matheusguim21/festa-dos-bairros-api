@@ -123,6 +123,7 @@ export class ProductsService {
       },
     });
   }
+
   // async findAllByStallId(
   //   stallId: number,
   //   { skip, take, search }: FindAllProductsProps
