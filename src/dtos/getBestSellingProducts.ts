@@ -1,7 +1,6 @@
 export interface GetBestSellingProductsFilter {
   page: number;
   limit: number;
-  skip: number;
   search?: string;
   stallId?: number;
   sortBy?:
@@ -12,5 +11,5 @@ export interface GetBestSellingProductsFilter {
     | "stock-desc"
     | "price-asc"
     | "price-desc";
-  stockLevel?: "low" | "out-of-stock" | "in-stock";
+  date?: string; // opcional agora
 }

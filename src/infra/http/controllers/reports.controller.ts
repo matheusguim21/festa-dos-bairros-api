@@ -17,7 +17,6 @@ export class ReportController {
   constructor(private reportService: ReportService) {}
 
   @Get()
-  @Get()
   async getBestSellingProducts(
     @Query("page", new DefaultValuePipe(0), ParseIntPipe) page: number,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -29,43 +28,68 @@ export class ReportController {
       | "revenue"
       | "name"
       | "stock-asc"
-      | "stock-desc" = "totalSold"
+      | "stock-desc" = "totalSold",
+    @Query("date") date?: string // apenas um parâmetro de data
   ) {
-    const skip = page * limit;
-
-    return this.reportService.getBestSellingProducts({
+    const filters: GetBestSellingProductsFilter = {
       page,
       limit,
       search,
       stallId: stallId ? Number(stallId) : undefined,
       sortBy,
-      skip,
-    });
+      date, // undefined se não vier
+    };
+
+    return this.reportService.getBestSellingProducts(filters);
+  }
+
+  @Get("best-selling-products/excel")
+  async downloadExcel(
+    @Res() res: Response,
+    @Query("page", new DefaultValuePipe(0), ParseIntPipe) page: number,
+    @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query("search") search?: string,
+    @Query("stallId") stallId?: string,
+    @Query("sortBy")
+    sortBy:
+      | "totalSold"
+      | "revenue"
+      | "name"
+      | "stock-asc"
+      | "stock-desc" = "totalSold",
+    @Query("date") date?: string
+  ) {
+    const filters: GetBestSellingProductsFilter = {
+      page,
+      limit,
+      search,
+      stallId: stallId ? Number(stallId) : undefined,
+      sortBy,
+      date,
+    };
+    Logger.log("Filters: ", filters);
+
+    const buffer = await this.reportService.generateBestSellingProductsExcel(
+      filters
+    );
+    Logger.log("Gerando relatório Excel de mais vendidos");
+
+    // nome de arquivo: se date, usa data; senão, relatório completo
+    const filename = date
+      ? `produtos-mais-vendidos_${date}.xlsx`
+      : `produtos-mais-vendidos-complete.xlsx`;
+
+    res
+      .setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+      .setHeader("Content-Disposition", `attachment; filename=${filename}`)
+      .end(buffer);
   }
 
   @Get("receita-total")
   async getTotalRevenue() {
     return this.reportService.getTotalRevenue();
-  }
-  @Get("best-selling-products/excel")
-  async downloadExcel(
-    @Query() query: GetBestSellingProductsFilter,
-    @Res() res: Response
-  ) {
-    const buffer = await this.reportService.generateBestSellingProductsExcel(
-      query
-    );
-    Logger.log("Chegou aqui");
-
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=produtos-mais-vendidos.xlsx"
-    );
-
-    res.end(buffer);
   }
 }

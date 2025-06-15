@@ -1,118 +1,182 @@
-// src/services/report.service.ts
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import { GetBestSellingProductsFilter } from "@/dtos/getBestSellingProducts";
 import { Prisma } from "@prisma/client";
-// src/services/report.service.ts
-import writeXlsxFile from "write-excel-file/node";
 import { Workbook } from "exceljs";
+
 @Injectable()
 export class ReportService {
   constructor(private prisma: PrismaService) {}
 
-  async getBestSellingProducts(filters: GetBestSellingProductsFilter) {
-    // 1) Usa o page enviado e calcula o skip
-    const { page = 0, limit, search, stallId, sortBy } = filters;
+  private buildWhereBase(
+    filters: GetBestSellingProductsFilter,
+    windowStart?: Date,
+    windowEnd?: Date
+  ): Prisma.OrderItemWhereInput {
+    const where: Prisma.OrderItemWhereInput = {};
+
+    // Filtro por barraca
+    if (filters.stallId) {
+      where.order = { is: { stallId: filters.stallId } };
+    }
+
+    // Filtro de busca
+    if (filters.search) {
+      where.product = {
+        name: { contains: filters.search, mode: "insensitive" },
+      };
+    }
+
+    // Filtro de janela de horário (18h do dia até 1h do dia seguinte)
+    if (windowStart && windowEnd) {
+      const baseOrder = (where.order as any)?.is || {};
+      where.order = {
+        is: {
+          ...baseOrder,
+          createdAt: { gte: windowStart, lt: windowEnd },
+        },
+      };
+    }
+
+    return where;
+  }
+
+  private async getSalesWindow(
+    filters: Omit<GetBestSellingProductsFilter, "date"> & {
+      windowStart?: Date;
+      windowEnd?: Date;
+    }
+  ) {
+    const { page = 0, limit, sortBy, windowStart, windowEnd } = filters;
     const skip = page * limit;
+    const where = this.buildWhereBase(filters, windowStart, windowEnd);
 
-    // 2) Monta o filtro common
-    const where: Prisma.OrderItemWhereInput = {
-      order: stallId ? { stallId } : {},
-      ...(search
-        ? { product: { name: { contains: search, mode: "insensitive" } } }
-        : {}),
-    };
-
-    // 3) Define a ordenação
     const orderBy =
       sortBy === "revenue"
         ? { _sum: { lineTotal: Prisma.SortOrder.desc } }
         : sortBy === "name"
-        ? { product: { name: Prisma.SortOrder.asc } }
+        ? undefined
         : { _sum: { quantity: Prisma.SortOrder.desc } };
 
-    // 4) Executa a transação
-    const [items, allDistinct, overallUnits] = await this.prisma.$transaction([
-      // 4a) Pega a página atual
-      this.prisma.orderItem.groupBy({
-        by: ["productId"],
-        where,
-        _sum: { quantity: true, lineTotal: true },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      // 4b) Conta produtos distintos (sem paginação)
-      this.prisma.orderItem.groupBy({
-        by: ["productId"],
-        where,
-        orderBy: { productId: "asc" },
-      }),
-      // 4c) Soma geral de unidades
-      this.prisma.orderItem.aggregate({
-        where,
-        _sum: { quantity: true },
-      }),
-    ]);
+    const params: any = {
+      by: ["productId"],
+      where,
+      _sum: { quantity: true, lineTotal: true },
+      skip,
+      take: limit,
+    };
+    if (orderBy) params.orderBy = orderBy;
 
-    // 5) Constrói totalElements a partir do tamanho de allDistinct
-    const totalProducts = allDistinct.length;
+    const items = await this.prisma.orderItem.groupBy(params);
+    const allDistinct = await this.prisma.orderItem.groupBy({
+      by: ["productId"],
+      where,
+    });
+    const overall = await this.prisma.orderItem.aggregate({
+      where,
+      _sum: { quantity: true, lineTotal: true },
+    });
 
-    // 6) Carrega dados dos produtos
     const productIds = items.map((i) => i.productId);
     const products = await this.prisma.product.findMany({
       where: { id: { in: productIds } },
       include: { stall: true },
     });
 
-    // 7) Enriquecimento
     let enriched = items.map((item) => {
-      const product = products.find((p) => p.id === item.productId)!;
+      const p = products.find((x) => x.id === item.productId)!;
       return {
-        id: product.id,
-        name: product.name,
-        stall: product.stall,
-        price: product.price,
-        quantity: product.quantity,
-        criticalStock: product.criticalStock,
+        id: p.id,
+        name: p.name,
+        stall: p.stall,
+        price: p.price,
+        quantity: p.quantity,
+        criticalStock: p.criticalStock,
         totalSold: item._sum?.quantity || 0,
         revenue: item._sum?.lineTotal || 0,
       };
     });
 
-    // 8) Ordenação extra por estoque, se necessário
-    if (sortBy === "stock-asc") {
+    if (sortBy === "stock-asc")
       enriched.sort((a, b) => a.quantity - b.quantity);
-    } else if (sortBy === "stock-desc") {
+    if (sortBy === "stock-desc")
       enriched.sort((a, b) => b.quantity - a.quantity);
-    }
 
-    // 9) Retorno paginado correto
     return {
       content: enriched,
-      totalElements: totalProducts, // produtos distintos
-      page, // usa o page do cliente
+      totalElements: allDistinct.length,
+      page,
       limit,
-      totalPages: Math.ceil(totalProducts / limit),
-      totalUnitsSold: overallUnits._sum.quantity || 0,
+      totalPages: Math.ceil(allDistinct.length / limit),
+      totalUnitsSold: overall._sum.quantity || 0,
+      totalRevenue: overall._sum.lineTotal || 0,
     };
+  }
+
+  async getBestSellingProducts(filters: GetBestSellingProductsFilter) {
+    // Se data fornecida, calcula janela de 18h do dia até 1h da manhã do dia seguinte
+    if (filters.date) {
+      const day = filters.date; // e.g. "2025-06-10"
+      // antes:
+      // const windowStart = new Date(`${day}T18:00:00`);
+      // const nextDay = new Date(day); nextDay.setDate(...);
+      // const windowEnd   = new Date(`${nextDay}T01:00:00`);
+
+      // depois:
+      // filtro de 18:00 do dia até 05:00 do dia seguinte (horário de São Paulo)
+      const windowStart = new Date(`${day}T18:00:00-03:00`);
+      const nextDay = new Date(day);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const nextDayStr = nextDay.toISOString().slice(0, 10);
+      const windowEnd = new Date(`${nextDayStr}T05:00:00-03:00`);
+
+      return this.getSalesWindow({ ...filters, windowStart, windowEnd });
+    }
+
+    // Sem data → retorna tudo sem filtrar por horário
+    return this.getSalesWindow({ ...filters });
   }
 
   async generateBestSellingProductsExcel(
     filters: GetBestSellingProductsFilter
   ): Promise<Buffer> {
-    const result = await this.getBestSellingProducts({
-      ...filters,
-      limit: Number(filters.limit),
-      page: Number(filters.page),
-      stallId: Number(filters.stallId),
-    });
-
     const workbook = new Workbook();
-    const worksheet = workbook.addWorksheet("Mais Vendidos");
 
-    // Definição de colunas e larguras
-    worksheet.columns = [
+    if (filters.date) {
+      const day = filters.date; // “YYYY-MM-DD”
+      const windowStart = new Date(`${day}T18:00:00-03:00`);
+
+      const next = new Date(day);
+      next.setDate(next.getDate() + 1);
+      const nextDayStr = next.toISOString().slice(0, 10);
+
+      // Aqui você aumenta para 05:00:
+      const windowEnd = new Date(`${nextDayStr}T05:00:00-03:00`);
+
+      const data = await this.getSalesWindow({
+        ...filters,
+        page: 0,
+        windowStart,
+        windowEnd,
+      });
+      this.buildSheet(workbook, `Dia ${day}`, data);
+    } else {
+      // Relatório completo (sem data) → única aba
+      const allData = await this.getSalesWindow({ ...filters, page: 0 });
+      this.buildSheet(workbook, "Relatório Completo", allData);
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  private buildSheet(
+    wb: Workbook,
+    title: string,
+    data: Awaited<ReturnType<ReportService["getSalesWindow"]>>
+  ) {
+    const ws = wb.addWorksheet(title);
+    ws.columns = [
       { header: "Produto", key: "name", width: 30 },
       { header: "Barraca", key: "stall", width: 25 },
       { header: "Preço Unitário (R$)", key: "price", width: 20 },
@@ -120,78 +184,55 @@ export class ReportService {
       { header: "Receita Total (R$)", key: "revenue", width: 20 },
     ];
 
-    // Estilizar cabeçalho
-    const headerRow = worksheet.getRow(1);
-    headerRow.height = 20;
-    headerRow.eachCell((cell, colNumber) => {
-      let bgColor = "FF0070F3"; // padrão azul
-      if (colNumber === 2) bgColor = "FFF97316"; // laranja
-      if (colNumber === 3) bgColor = "FF10B981"; // verde
-      if (colNumber === 4) bgColor = "FF6366F1"; // roxo
-      if (colNumber === 5) bgColor = "FFEF4444"; // vermelho
-
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: bgColor },
-      };
+    // Cabeçalho estilizado
+    const header = ws.getRow(1);
+    header.height = 20;
+    header.eachCell((cell, idx) => {
+      const colors = [
+        "FF0070F3",
+        "FFF97316",
+        "FF10B981",
+        "FF6366F1",
+        "FFEF4444",
+      ];
+      const bg = colors[idx - 1] || colors[0];
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: bg } };
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
 
-    // Adicionar linhas de dados
-    result.content.forEach((item) => {
-      worksheet.addRow({
-        name: item.name,
-        stall: item.stall.name,
-        price: item.price,
-        totalSold: item.totalSold,
-        revenue: item.revenue,
+    // Dados
+    data.content.forEach((r) => {
+      ws.addRow({
+        name: r.name,
+        stall: r.stall.name,
+        price: r.price,
+        totalSold: r.totalSold,
+        revenue: r.revenue,
       });
     });
 
-    // Calcular totais
-    const startRow = 2; // primeira linha de dados
-    const endRow = worksheet.rowCount;
-    const totalUnits = result.content.reduce((sum, r) => sum + r.totalSold, 0);
-    const totalRevenue = result.content.reduce((sum, r) => sum + r.revenue, 0);
-
-    // Linha em branco antes dos totais
-    worksheet.addRow([]);
-    const totalRowNumber = worksheet.rowCount + 1;
-    // Adiciona linha de totais
-    const totalRow = worksheet.addRow({
+    // Totais
+    ws.addRow([]);
+    const totalRow = ws.addRow({
       name: "Totais",
-      stall: "",
-      price: "",
-      totalSold: totalUnits,
-      revenue: totalRevenue,
+      totalSold: data.totalUnitsSold,
+      revenue: data.totalRevenue,
     });
-    // Mesclar células A até C para o rótulo
-    worksheet.mergeCells(`A${totalRow.number}:C${totalRow.number}`);
-    totalRow.getCell("A").font = { bold: true, size: 12 };
-    totalRow.getCell("D").font = { bold: true, size: 12 };
-    totalRow.getCell("E").font = { bold: true, size: 12 };
-    totalRow.eachCell((cell) => {
-      cell.alignment = { vertical: "middle", horizontal: "center" };
+    ws.mergeCells(`A${totalRow.number}:C${totalRow.number}`);
+    ["A", "D", "E"].forEach((col) => {
+      const c = totalRow.getCell(col);
+      c.font = { bold: true };
+      c.alignment = { vertical: "middle", horizontal: "center" };
     });
 
-    // Formatar colunas numéricas
-    worksheet.getColumn("price").numFmt = "R$ #,##0.00";
-    worksheet.getColumn("revenue").numFmt = "R$ #,##0.00";
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    return Buffer.from(buffer);
+    // Formatação
+    ws.getColumn("price").numFmt = "R$ #,##0.00";
+    ws.getColumn("revenue").numFmt = "R$ #,##0.00";
   }
-  async getTotalRevenue() {
-    const result = await this.prisma.order.aggregate({
-      _sum: {
-        total: true,
-      },
-    });
 
-    return {
-      totalRevenue: result._sum.total || 0,
-    };
+  async getTotalRevenue() {
+    const result = await this.prisma.order.aggregate({ _sum: { total: true } });
+    return { totalRevenue: result._sum.total || 0 };
   }
 }
