@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ["nodejs", "corepack"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "pnpm install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = [
+  "pnpm exec prisma generate",
+  "pnpm run build"
+]
+
+[start]
+cmd = "node dist/main.js"
