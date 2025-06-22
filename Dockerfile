@@ -21,4 +21,4 @@ RUN pnpm exec prisma generate
 RUN pnpm run build
 
 # Aponta o comando de start
-CMD ["node", "dist/main.js"]
+CMD ["nest start"]
