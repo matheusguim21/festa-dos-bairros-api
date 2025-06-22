@@ -1,24 +1,23 @@
 FROM node:22-alpine
 
-# Habilita o pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 WORKDIR /app
 
-# Copia apenas os arquivos necessários primeiro (melhor cache)
+# Ativa o pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copia arquivos essenciais primeiro para aproveitar o cache
 COPY package.json pnpm-lock.yaml ./
 
-# Instala dependências
 RUN pnpm install --frozen-lockfile
 
 # Copia o restante do código
 COPY . .
 
-# Gera o cliente do Prisma
+# Gera os arquivos do Prisma
 RUN pnpm exec prisma generate
 
-# Compila a aplicação NestJS
+# Compila o NestJS (gera `dist/`)
 RUN pnpm run build
 
-# Aponta o comando de start
-CMD ["nest start"]
+# Inicia a aplicação
+CMD ["pnpm", "run", "start"]
