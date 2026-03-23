@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import { GetBestSellingProductsFilter } from "@/dtos/getBestSellingProducts";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { Workbook } from "exceljs";
 
 @Injectable()

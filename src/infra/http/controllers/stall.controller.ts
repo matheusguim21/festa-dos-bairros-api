@@ -15,7 +15,7 @@ import {
 } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
-import { Prisma, Stall, User } from "@prisma/client";
+import { Prisma, Stall, User } from "@/generated/prisma/client";
 
 const createStallSchema = z.object({
   stallName: z.string(),
@@ -60,6 +60,19 @@ export class StallController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  @Get(":id")
+  async findOne(@Param("id") id: string): Promise<Stall> {
+    const n = Number(id);
+    if (!Number.isInteger(n) || n < 1) {
+      throw new HttpException("Barraca não encontrada", HttpStatus.NOT_FOUND);
+    }
+    const stall = await this.stallService.stallExists(n);
+    if (!stall) {
+      throw new HttpException("Barraca não encontrada", HttpStatus.NOT_FOUND);
+    }
+    return stall;
   }
 
   @Post()

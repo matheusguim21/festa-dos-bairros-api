@@ -16,7 +16,7 @@ import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { OrderService } from "@/services/order.service";
 import { Response } from "express";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/generated/prisma/client";
 
 const OrderQuerySchema = z.object({
   search: z.string().optional(),
@@ -36,6 +36,26 @@ export const CreateOrderSchema = z.object({
   items: z.array(CreateOrderItemSchema).min(1),
 });
 
+export const CheckoutOrderSchema = z
+  .object({
+    stallId: z.number().int().positive(),
+    buyerName: z.string().min(1).optional(),
+    items: z.array(CreateOrderItemSchema).min(1),
+    back_urls: z
+      .object({
+        success: z.string().url(),
+        failure: z.string().url(),
+        pending: z.string().url(),
+      })
+      .optional(),
+    return_base_url: z.string().min(1).optional(),
+  })
+  .refine((d) => d.back_urls != null || d.return_base_url != null, {
+    message: "Informe back_urls ou return_base_url",
+  });
+
+export type CheckoutOrderDto = z.infer<typeof CheckoutOrderSchema>;
+
 export const UpdateOrderStatusSchema = z.object({
   status: z.nativeEnum(OrderStatus),
 });
@@ -49,6 +69,18 @@ export type CreateOrderDto = z.infer<typeof CreateOrderSchema>;
 @Controller("orders")
 export class OrdersController {
   constructor(private readonly ordersService: OrderService) {}
+
+  @Get("pickup/:token")
+  async pickupByToken(@Param("token") token: string) {
+    return this.ordersService.getPickupByToken(token);
+  }
+
+  @Get(":orderId/customer")
+  async customerOrderView(
+    @Param("orderId", ParseIntPipe) orderId: number,
+  ) {
+    return this.ordersService.getOrderWithPickupForPublic(orderId);
+  }
 
   @Get()
   @HttpCode(200)
@@ -68,6 +100,14 @@ export class OrdersController {
     } catch (error: any) {
       throw error;
     }
+  }
+
+  @Post("checkout")
+  @HttpCode(201)
+  async checkout(
+    @Body(new ZodValidationPipe(CheckoutOrderSchema)) data: CheckoutOrderDto,
+  ) {
+    return this.ordersService.createCheckoutOrder(data);
   }
 
   @Post()

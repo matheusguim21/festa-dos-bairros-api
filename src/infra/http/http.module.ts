@@ -10,6 +10,7 @@ import { ProductsController } from "./controllers/products.controller";
 import { UserController } from "./controllers/user.controller";
 import { OrderService } from "@/services/order.service";
 import { OrdersController } from "./controllers/order.controller";
+import { InternalPaymentsController } from "./controllers/internal-payments.controller";
 import { OrdersGateway } from "./gateways/order.gateway";
 import { ReportService } from "@/services/reports.service";
 import { ReportController } from "./controllers/reports.controller";
@@ -23,6 +24,7 @@ import { ResetPricesService } from "@/services/reset-prices.service";
     ProductsController,
     UserController,
     OrdersController,
+    InternalPaymentsController,
     ReportController,
     ResetPricesController,
   ],

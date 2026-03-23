@@ -1,7 +1,7 @@
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import { CreateStallRequest } from "@/infra/http/controllers/stall.controller";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { hash } from "bcryptjs";
 import { AuthenticationService } from "./auth.service";
 import { UserService } from "./user.service";

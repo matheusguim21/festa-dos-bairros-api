@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import * as z from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { AuthenticationService } from "@/services/auth.service";
-import { Role } from "@prisma/client";
+import { Role } from "@/generated/prisma/client";
 import { UserService } from "@/services/user.service";
 
 const CreateUserSchema = z.object({

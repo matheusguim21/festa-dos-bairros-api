@@ -1,8 +1,16 @@
 // prisma/seed.ts
-import { PrismaClient, Role } from "@prisma/client";
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient, Role } from "../src/generated/prisma/client";
 import { hash } from "bcryptjs";
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not set");
+}
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 type StallConfig = {
   name: string;
