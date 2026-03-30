@@ -20,7 +20,7 @@ import { number, string, z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { NotFoundError } from "rxjs";
 import { Prisma } from "@/generated/prisma/client";
-import { Response } from "express";
+import type { Response } from "express";
 import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
 import { DEFAULT_PRICES } from "@/dtos/default-prices";
 
