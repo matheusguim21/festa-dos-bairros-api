@@ -10,7 +10,7 @@ import {
   Query,
   Res,
 } from "@nestjs/common";
-import { Response } from "express";
+import type { Response } from "express";
 
 @Controller("reports")
 export class ReportController {

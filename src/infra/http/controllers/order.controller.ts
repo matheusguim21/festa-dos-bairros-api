@@ -15,7 +15,7 @@ import {
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { OrderService } from "@/services/order.service";
-import { Response } from "express";
+import type { Response } from "express";
 import { OrderStatus } from "@/generated/prisma/client";
 
 const OrderQuerySchema = z.object({

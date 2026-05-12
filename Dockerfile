@@ -1,18 +1,17 @@
-FROM node:22-slim
+FROM oven/bun:1-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y openssl
+RUN apt-get update && apt-get install -y openssl \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+COPY package.json bun.lock ./
 
-COPY package.json pnpm-lock.yaml ./
-
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
-RUN pnpm exec prisma generate
-RUN pnpm run build
+RUN bunx prisma generate
+RUN bun run build
 
-CMD ["pnpm", "run", "start"]
+CMD ["bun", "run", "start:bun"]
