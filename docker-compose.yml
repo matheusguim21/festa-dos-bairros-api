@@ -3,7 +3,7 @@ services:
     container_name: festadosbairrosapi-pg
     image: bitnami/postgresql
     ports:
-      - 5433:5433
+      - 5433:5432
     environment:
       - POSTGRESQL_USERNAME=festadosbairros
       - POSTGRESQL_PASSWORD=festadosbairros
