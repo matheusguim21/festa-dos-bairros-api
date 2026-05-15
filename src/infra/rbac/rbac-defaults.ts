@@ -39,5 +39,6 @@ export const LEGACY_ROLE_SCREEN_KEYS: Record<Role, string[]> = {
     "barracas",
     "usuarios",
   ],
+  FESTA_ADMIN: ["site_festa", "barracas"],
   CASHIER: ["caixa"],
 };
