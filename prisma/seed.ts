@@ -3,6 +3,8 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Role } from "../src/generated/prisma/client";
 import { hash } from "bcryptjs";
+import { ensureRbacInfrastructure } from "./rbac-seed";
+import { legacyAppRoleSlug } from "../src/infra/rbac/rbac-defaults";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -160,6 +162,8 @@ const stallsWithProducts: StallConfig[] = [
 ];
 
 async function main() {
+  await ensureRbacInfrastructure(prisma);
+
   for (const stall of stallsWithProducts) {
     const hashedPassword = await hash(stall.password, 10);
 
@@ -171,6 +175,7 @@ async function main() {
           username: stall.username,
           password: hashedPassword,
           role: stall.role!,
+          appRole: { connect: { slug: legacyAppRoleSlug(stall.role!) } },
         },
       });
       continue;
@@ -183,6 +188,7 @@ async function main() {
         username: stall.username,
         password: hashedPassword,
         role: Role.STALL_ADMIN,
+        appRole: { connect: { slug: legacyAppRoleSlug(Role.STALL_ADMIN) } },
         stall: {
           create: {
             name: stall.name,
@@ -206,10 +212,32 @@ async function main() {
         username: `${stall.username}_admin`,
         password: hashedPassword,
         role: Role.STALL_ADMIN,
+        appRole: { connect: { slug: legacyAppRoleSlug(Role.STALL_ADMIN) } },
         stall: {
           connect: { id: createdUser.stall!.id },
         },
       },
+    });
+  }
+
+  const sponsorCount = await prisma.sponsor.count();
+  if (sponsorCount === 0) {
+    await prisma.sponsor.createMany({
+      data: [
+        {
+          name: "Patrocinador exemplo 1",
+          logoUrl: "https://picsum.photos/seed/fdb1/320/120",
+          websiteUrl: "https://example.com",
+          displayOrder: 0,
+          isActive: true,
+        },
+        {
+          name: "Patrocinador exemplo 2",
+          logoUrl: "https://picsum.photos/seed/fdb2/320/120",
+          displayOrder: 1,
+          isActive: true,
+        },
+      ],
     });
   }
 

@@ -9,6 +9,9 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/ManagerScreen'
+export type * from './models/AppRole'
+export type * from './models/AppRoleScreen'
 export type * from './models/Stall'
 export type * from './models/Product'
 export type * from './models/Order'
@@ -17,4 +20,7 @@ export type * from './models/StockIn'
 export type * from './models/StockOut'
 export type * from './models/Cashier'
 export type * from './models/TokenSale'
+export type * from './models/Sponsor'
+export type * from './models/FestaGalleryImage'
+export type * from './models/FestaSiteConfig'
 export type * from './commonInputTypes'

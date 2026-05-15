@@ -12,7 +12,6 @@ import {
   Post,
   Put,
   Query,
-  Res,
   UseGuards,
   UsePipes,
 } from "@nestjs/common";
@@ -20,7 +19,6 @@ import { number, string, z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { NotFoundError } from "rxjs";
 import { Prisma } from "@/generated/prisma/client";
-import type { Response } from "express";
 import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
 import { DEFAULT_PRICES } from "@/dtos/default-prices";
 
@@ -39,6 +37,7 @@ const createProductSchema = z.object({
   quantity: z.number(),
   stallId: z.number(),
   criticalStock: z.number().optional(),
+  description: z.string().max(50000).optional().nullable(),
 });
 const updateProductSchema = z.object({
   productId: z.number(),
@@ -47,6 +46,7 @@ const updateProductSchema = z.object({
   quantity: z.number().optional(),
   criticalStock: z.number().optional(),
   stallId: z.number().optional(),
+  description: z.string().max(50000).optional().nullable(),
   operation: z.enum(["IN", "OUT", "NOONE"]),
 });
 const deleteProductSchema = z.coerce.number();
@@ -127,21 +127,16 @@ export class ProductsController {
   @UsePipes(new ZodValidationPipe(deleteProductSchema))
   @HttpCode(204)
   async deleteProductById(
-    @Res({
-      passthrough: true,
-    })
-    res: Response,
     @Param("productId")
     productId: DeleteProductRequestDTO
   ) {
     try {
-      return await this.productsService.deleteProduct(productId);
-    } catch (error: any) {
+      await this.productsService.deleteProduct(productId);
+    } catch (error: unknown) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        res.status(404);
-        return new NotFoundException("Produto inexistente");
+        throw new NotFoundException("Produto inexistente");
       }
-      return error;
+      throw error;
     }
   }
 

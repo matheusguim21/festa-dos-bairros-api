@@ -1,4 +1,5 @@
 import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
+import { AdminGuard } from "@/infra/auth/admin.guard";
 import { StallService } from "@/services/stall.service";
 import {
   Controller,
@@ -15,13 +16,29 @@ import {
 } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
-import { Prisma, Stall, User } from "@/generated/prisma/client";
+import { Stall } from "@/generated/prisma/client";
+
+const updateStallBodySchema = z
+  .object({
+    name: z.string().min(1).max(200).optional(),
+    imageUrl: z
+      .union([z.string().url().max(2048), z.literal(""), z.null()])
+      .optional(),
+  })
+  .transform((d) => ({
+    ...d,
+    imageUrl: d.imageUrl === "" ? null : d.imageUrl,
+  }))
+  .refine((d) => d.name !== undefined || d.imageUrl !== undefined, {
+    message: "Informe ao menos o nome ou a URL da imagem",
+  });
 
 const createStallSchema = z.object({
   stallName: z.string(),
   stallHolderName: z.string(),
   username: z.string(),
   password: z.string(),
+  imageUrl: z.string().max(2048).optional().nullable(),
 });
 
 export type CreateStallRequest = z.infer<typeof createStallSchema>;
@@ -76,6 +93,7 @@ export class StallController {
   }
 
   @Post()
+  @UseGuards(JWTAuthGuard, AdminGuard)
   @UsePipes(new ZodValidationPipe(createStallSchema))
   async create(@Body() createStallDto: CreateStallRequest): Promise<Stall> {
     try {
@@ -87,12 +105,18 @@ export class StallController {
   }
 
   @Put(":id")
+  @UseGuards(JWTAuthGuard, AdminGuard)
+  @UsePipes(new ZodValidationPipe(updateStallBodySchema))
   async update(
     @Param("id") id: string,
-    @Body() updateStallDto: Partial<Stall>
+    @Body() updateStallDto: z.infer<typeof updateStallBodySchema>,
   ): Promise<Stall> {
+    const n = Number(id);
+    if (!Number.isInteger(n) || n < 1) {
+      throw new HttpException("Barraca não encontrada", HttpStatus.NOT_FOUND);
+    }
     try {
-      return await this.stallService.update(Number(id), updateStallDto);
+      return await this.stallService.update(n, updateStallDto);
     } catch (error) {
       throw new HttpException(
         "Erro ao atualizar barraca",
@@ -102,6 +126,7 @@ export class StallController {
   }
 
   @Delete(":id")
+  @UseGuards(JWTAuthGuard, AdminGuard)
   async remove(@Param("id") id: string): Promise<Stall> {
     try {
       return await this.stallService.delete(Number(id));

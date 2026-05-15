@@ -10,7 +10,7 @@ import {
   Query,
   Res,
 } from "@nestjs/common";
-import type { Response } from "express";
+import type { FastifyReply } from "fastify";
 
 @Controller("reports")
 export class ReportController {
@@ -45,7 +45,7 @@ export class ReportController {
 
   @Get("best-selling-products/excel")
   async downloadExcel(
-    @Res() res: Response,
+    @Res() reply: FastifyReply,
     @Query("page", new DefaultValuePipe(0), ParseIntPipe) page: number,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query("search") search?: string,
@@ -79,13 +79,13 @@ export class ReportController {
       ? `produtos-mais-vendidos_${date}.xlsx`
       : `produtos-mais-vendidos-complete.xlsx`;
 
-    res
-      .setHeader(
+    reply
+      .header(
         "Content-Type",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       )
-      .setHeader("Content-Disposition", `attachment; filename=${filename}`)
-      .end(buffer);
+      .header("Content-Disposition", `attachment; filename=${filename}`)
+      .send(buffer);
   }
 
   @Get("receita-total")

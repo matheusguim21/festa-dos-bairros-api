@@ -23,6 +23,21 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model ManagerScreen
+ * Catálogo de telas do manager (chave estável alinhada ao front)
+ */
+export type ManagerScreen = Prisma.ManagerScreenModel
+/**
+ * Model AppRole
+ * Papel dinâmico (permissões por tela)
+ */
+export type AppRole = Prisma.AppRoleModel
+/**
+ * Model AppRoleScreen
+ * 
+ */
+export type AppRoleScreen = Prisma.AppRoleScreenModel
+/**
  * Model Stall
  * 
  */
@@ -62,3 +77,18 @@ export type Cashier = Prisma.CashierModel
  * 
  */
 export type TokenSale = Prisma.TokenSaleModel
+/**
+ * Model Sponsor
+ * 
+ */
+export type Sponsor = Prisma.SponsorModel
+/**
+ * Model FestaGalleryImage
+ * 
+ */
+export type FestaGalleryImage = Prisma.FestaGalleryImageModel
+/**
+ * Model FestaSiteConfig
+ * Configuração singleton do site (use id = 1)
+ */
+export type FestaSiteConfig = Prisma.FestaSiteConfigModel

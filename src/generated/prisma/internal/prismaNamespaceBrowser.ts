@@ -52,6 +52,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  ManagerScreen: 'ManagerScreen',
+  AppRole: 'AppRole',
+  AppRoleScreen: 'AppRoleScreen',
   Stall: 'Stall',
   Product: 'Product',
   Order: 'Order',
@@ -59,7 +62,10 @@ export const ModelName = {
   StockIn: 'StockIn',
   StockOut: 'StockOut',
   Cashier: 'Cashier',
-  TokenSale: 'TokenSale'
+  TokenSale: 'TokenSale',
+  Sponsor: 'Sponsor',
+  FestaGalleryImage: 'FestaGalleryImage',
+  FestaSiteConfig: 'FestaSiteConfig'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,6 +91,7 @@ export const UserScalarFieldEnum = {
   password: 'password',
   role: 'role',
   stallId: 'stallId',
+  appRoleId: 'appRoleId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -92,9 +99,43 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const ManagerScreenScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  pathSegment: 'pathSegment',
+  label: 'label',
+  sortOrder: 'sortOrder'
+} as const
+
+export type ManagerScreenScalarFieldEnum = (typeof ManagerScreenScalarFieldEnum)[keyof typeof ManagerScreenScalarFieldEnum]
+
+
+export const AppRoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  isAdmin: 'isAdmin',
+  mapsToRole: 'mapsToRole',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AppRoleScalarFieldEnum = (typeof AppRoleScalarFieldEnum)[keyof typeof AppRoleScalarFieldEnum]
+
+
+export const AppRoleScreenScalarFieldEnum = {
+  appRoleId: 'appRoleId',
+  screenId: 'screenId'
+} as const
+
+export type AppRoleScreenScalarFieldEnum = (typeof AppRoleScreenScalarFieldEnum)[keyof typeof AppRoleScreenScalarFieldEnum]
+
+
 export const StallScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  imageUrl: 'imageUrl'
 } as const
 
 export type StallScalarFieldEnum = (typeof StallScalarFieldEnum)[keyof typeof StallScalarFieldEnum]
@@ -103,6 +144,7 @@ export type StallScalarFieldEnum = (typeof StallScalarFieldEnum)[keyof typeof St
 export const ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  description: 'description',
   price: 'price',
   quantity: 'quantity',
   criticalStock: 'criticalStock',
@@ -188,6 +230,44 @@ export const TokenSaleScalarFieldEnum = {
 } as const
 
 export type TokenSaleScalarFieldEnum = (typeof TokenSaleScalarFieldEnum)[keyof typeof TokenSaleScalarFieldEnum]
+
+
+export const SponsorScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  logoUrl: 'logoUrl',
+  websiteUrl: 'websiteUrl',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SponsorScalarFieldEnum = (typeof SponsorScalarFieldEnum)[keyof typeof SponsorScalarFieldEnum]
+
+
+export const FestaGalleryImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  alt: 'alt',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FestaGalleryImageScalarFieldEnum = (typeof FestaGalleryImageScalarFieldEnum)[keyof typeof FestaGalleryImageScalarFieldEnum]
+
+
+export const FestaSiteConfigScalarFieldEnum = {
+  id: 'id',
+  videoFileUrl: 'videoFileUrl',
+  videoEmbedUrl: 'videoEmbedUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FestaSiteConfigScalarFieldEnum = (typeof FestaSiteConfigScalarFieldEnum)[keyof typeof FestaSiteConfigScalarFieldEnum]
 
 
 export const SortOrder = {

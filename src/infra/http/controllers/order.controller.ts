@@ -15,7 +15,7 @@ import {
 import { z } from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 import { OrderService } from "@/services/order.service";
-import type { Response } from "express";
+import type { FastifyReply } from "fastify";
 import { OrderStatus } from "@/generated/prisma/client";
 
 const OrderQuerySchema = z.object({
@@ -112,11 +112,11 @@ export class OrdersController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(CreateOrderSchema))
-  async create(@Body() data: CreateOrderDto, @Res() response: Response) {
+  async create(@Body() data: CreateOrderDto, @Res() reply: FastifyReply) {
     try {
       const order = await this.ordersService.createOrder(data);
 
-      return response.status(201).send({
+      return reply.code(201).send({
         message: "Pedido criado",
         orderId: order.id,
         status: order.status,

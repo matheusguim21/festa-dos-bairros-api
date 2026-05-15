@@ -79,6 +79,9 @@ export class ProductsService {
           data: {
             name: data.name,
             price: data.price,
+            ...(data.description !== undefined
+              ? { description: data.description }
+              : {}),
             quantity:
               data.operation === "IN"
                 ? {
@@ -115,7 +118,9 @@ export class ProductsService {
       data: {
         name: data.name,
         price: data.price,
-
+        ...(data.description !== undefined
+          ? { description: data.description }
+          : {}),
         criticalStock: data.criticalStock,
       },
       where: {

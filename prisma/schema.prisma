@@ -35,12 +35,50 @@ model User {
   role      Role     @default(STALL_SELLER)
   stallId   Int?                     // 🔸 FK opcional
   stall     Stall?   @relation(fields: [stallId], references: [id])
+  appRoleId Int?
+  appRole   AppRole? @relation(fields: [appRoleId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// Catálogo de telas do manager (chave estável alinhada ao front)
+model ManagerScreen {
+  id          Int             @id @default(autoincrement())
+  key         String          @unique
+  pathSegment String
+  label       String
+  sortOrder   Int             @default(0)
+  appRoles    AppRoleScreen[]
+}
+
+/// Papel dinâmico (permissões por tela)
+model AppRole {
+  id          Int             @id @default(autoincrement())
+  name        String
+  slug        String          @unique
+  description String?
+  isAdmin     Boolean         @default(false)
+  /// Compatibilidade com `User.role` enum até remoção futura
+  mapsToRole  Role?
+  users       User[]
+  screens     AppRoleScreen[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model AppRoleScreen {
+  appRoleId Int
+  screenId  Int
+  appRole   AppRole       @relation(fields: [appRoleId], references: [id], onDelete: Cascade)
+  screen    ManagerScreen @relation(fields: [screenId], references: [id], onDelete: Cascade)
+
+  @@id([appRoleId, screenId])
 }
 model Stall {
   id        Int      @id @default(autoincrement())
   name      String
+  /// URL pública da imagem da barraca (ex. CloudFront/S3)
+  imageUrl  String?
   users     User[]                    // 🔸 1:N relação reversa
   products  Product[]
   orders    Order[]
@@ -49,6 +87,7 @@ model Stall {
 model Product {
   id             Int         @id @default(autoincrement())
   name           String
+  description    String?     @db.Text
   price          Float
   quantity       Int         @default(0)
   criticalStock  Int         @default(5) // ✅ novo campo
@@ -127,4 +166,34 @@ model TokenSale {
   amountPaid  Float
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Sponsor {
+  id           Int      @id @default(autoincrement())
+  name         String
+  logoUrl      String
+  websiteUrl   String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model FestaGalleryImage {
+  id           Int      @id @default(autoincrement())
+  url          String
+  alt          String
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+/// Configuração singleton do site (use id = 1)
+model FestaSiteConfig {
+  id            Int      @id @default(1)
+  videoFileUrl  String?
+  videoEmbedUrl String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

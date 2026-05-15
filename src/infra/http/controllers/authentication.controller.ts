@@ -1,5 +1,4 @@
 import { Body, Controller, HttpCode, Post, UsePipes } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 
 import * as z from "zod";
 import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
@@ -23,7 +22,13 @@ const LoginSchema = z.object({
   password: z.string(),
 });
 
+const RefreshSchema = z.object({
+  refresh_token: z.string().min(1),
+});
+
 export type LoginRequest = z.infer<typeof LoginSchema>;
+
+export type RefreshRequest = z.infer<typeof RefreshSchema>;
 
 export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
 
@@ -64,5 +69,12 @@ export class AuthenticationController {
     } catch (error) {
       throw error;
     }
+  }
+
+  @UsePipes(new ZodValidationPipe(RefreshSchema))
+  @HttpCode(200)
+  @Post("/refresh")
+  async refresh(@Body() body: RefreshRequest) {
+    return this.authenticationService.refreshTokens(body.refresh_token);
   }
 }
