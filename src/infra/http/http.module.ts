@@ -25,6 +25,7 @@ import { AdminFestaSiteConfigController } from "./controllers/admin-festa-site-c
 import { AdminSiteUploadController } from "./controllers/admin-site-upload.controller";
 import { FestaGalleryService } from "@/services/festa-gallery.service";
 import { FestaSiteConfigService } from "@/services/festa-site-config.service";
+import { ImageProcessingService } from "../storage/image-processing.service";
 import { FestaS3Service } from "../storage/festa-s3.service";
 import { AdminGuard } from "../auth/admin.guard";
 import { AdminOrSelfGuard } from "../auth/admin-or-self.guard";
@@ -65,6 +66,7 @@ import { ManagerRbacService } from "@/services/manager-rbac.service";
     FestaGalleryService,
     FestaSiteConfigService,
     FestaS3Service,
+    ImageProcessingService,
     AdminGuard,
     AdminOrSelfGuard,
     ManagerRbacService,

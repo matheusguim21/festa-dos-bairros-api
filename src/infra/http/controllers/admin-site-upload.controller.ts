@@ -1,5 +1,6 @@
 import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
 import { AdminGuard } from "@/infra/auth/admin.guard";
+import { ImageProcessingService } from "@/infra/storage/image-processing.service";
 import { FestaS3Service } from "@/infra/storage/festa-s3.service";
 import {
   BadRequestException,
@@ -30,7 +31,10 @@ const VIDEO_MIME = new Set(["video/mp4", "video/webm"]);
 @Controller("admin/site")
 @UseGuards(JWTAuthGuard, AdminGuard)
 export class AdminSiteUploadController {
-  constructor(private readonly festaS3: FestaS3Service) {}
+  constructor(
+    private readonly festaS3: FestaS3Service,
+    private readonly imageProcessing: ImageProcessingService,
+  ) {}
 
   @Post("upload")
   @UseInterceptors(FileInterceptor("file"))
@@ -57,18 +61,39 @@ export class AdminSiteUploadController {
       throw new BadRequestException("Imagem deve ser JPEG, PNG, WebP ou GIF");
     }
 
-    const ext =
-      file.originalname.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") ||
-      "bin";
     const folder =
       purpose === "video"
         ? "festa-site/video"
         : purpose === "sponsor"
           ? "festa-site/sponsors"
           : "festa-site/gallery";
+
+    let uploadBuffer: Buffer;
+    let contentType: string;
+    let ext: string;
+
+    if (purpose === "video") {
+      uploadBuffer = file.buffer;
+      contentType = file.mimetype;
+      ext =
+        file.originalname
+          .split(".")
+          .pop()
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, "") || "bin";
+    } else {
+      const processed = await this.imageProcessing.processForPurpose(
+        file.buffer,
+        purpose,
+      );
+      uploadBuffer = processed.buffer;
+      contentType = processed.contentType;
+      ext = processed.ext;
+    }
+
     const key = `${folder}/${Date.now()}-${randomUUID()}.${ext}`;
 
-    await this.festaS3.uploadPublicObject(key, file.buffer, file.mimetype);
+    await this.festaS3.uploadPublicObject(key, uploadBuffer, contentType);
     const url = this.festaS3.getPublicUrl(key);
     return { url, key };
   }

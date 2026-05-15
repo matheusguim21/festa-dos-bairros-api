@@ -330,4 +330,48 @@ export class UserService {
 
     return this.findUserById(userId);
   }
+
+  async resetUserPassword(userId: number, password: string) {
+    const existing = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+    if (!existing) {
+      throw new NotFoundException("Usuário não encontrado");
+    }
+
+    const hashedPassword = await hash(password, 8);
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+  }
+
+  async deleteUserAdmin(userId: number, actingUserId: number) {
+    if (userId === actingUserId) {
+      throw new BadRequestException("Você não pode excluir sua própria conta");
+    }
+
+    const existing = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: { appRole: { select: { isAdmin: true } } },
+    });
+    if (!existing) {
+      throw new NotFoundException("Usuário não encontrado");
+    }
+
+    const isAdmin =
+      existing.role === Role.ADMIN || Boolean(existing.appRole?.isAdmin);
+    if (isAdmin) {
+      const others = await this.countOtherSystemAdmins(userId);
+      if (others === 0) {
+        throw new BadRequestException(
+          "Não é possível excluir o último administrador do sistema",
+        );
+      }
+    }
+
+    await this.prismaService.user.delete({
+      where: { id: userId },
+    });
+  }
 }
