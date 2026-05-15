@@ -17,6 +17,7 @@ enum Role {
   ORDER_PREPARER
   CASHIER
   STALL_ADMIN
+  FESTA_ADMIN
 }
 
 enum OrderStatus {
