@@ -10,6 +10,14 @@ export type PublicSponsor = {
   displayOrder: number;
 };
 
+export type CreateSponsor = {
+  name: string;
+  logoUrl: string;
+  websiteUrl?: string | null;
+  displayOrder?: number;
+  isActive?: boolean;
+};
+
 @Injectable()
 export class SponsorService {
   constructor(
@@ -38,13 +46,7 @@ export class SponsorService {
     });
   }
 
-  async create(data: {
-    name: string;
-    logoUrl: string;
-    websiteUrl?: string | null;
-    displayOrder?: number;
-    isActive?: boolean;
-  }) {
+  async create(data: CreateSponsor) {
     const websiteUrl =
       data.websiteUrl === undefined || data.websiteUrl === ""
         ? null

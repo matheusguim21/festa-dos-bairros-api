@@ -397,6 +397,7 @@ export const ModelName = {
   Cashier: 'Cashier',
   TokenSale: 'TokenSale',
   Sponsor: 'Sponsor',
+  Attraction: 'Attraction',
   FestaGalleryImage: 'FestaGalleryImage',
   FestaSiteConfig: 'FestaSiteConfig'
 } as const
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "managerScreen" | "appRole" | "appRoleScreen" | "stall" | "product" | "order" | "orderItem" | "stockIn" | "stockOut" | "cashier" | "tokenSale" | "sponsor" | "festaGalleryImage" | "festaSiteConfig"
+    modelProps: "user" | "managerScreen" | "appRole" | "appRoleScreen" | "stall" | "product" | "order" | "orderItem" | "stockIn" | "stockOut" | "cashier" | "tokenSale" | "sponsor" | "attraction" | "festaGalleryImage" | "festaSiteConfig"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1380,6 +1381,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Attraction: {
+      payload: Prisma.$AttractionPayload<ExtArgs>
+      fields: Prisma.AttractionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AttractionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AttractionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>
+        }
+        findFirst: {
+          args: Prisma.AttractionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AttractionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>
+        }
+        findMany: {
+          args: Prisma.AttractionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>[]
+        }
+        create: {
+          args: Prisma.AttractionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>
+        }
+        createMany: {
+          args: Prisma.AttractionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AttractionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>[]
+        }
+        delete: {
+          args: Prisma.AttractionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>
+        }
+        update: {
+          args: Prisma.AttractionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>
+        }
+        deleteMany: {
+          args: Prisma.AttractionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AttractionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AttractionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>[]
+        }
+        upsert: {
+          args: Prisma.AttractionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttractionPayload>
+        }
+        aggregate: {
+          args: Prisma.AttractionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAttraction>
+        }
+        groupBy: {
+          args: Prisma.AttractionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AttractionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AttractionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AttractionCountAggregateOutputType> | number
+        }
+      }
+    }
     FestaGalleryImage: {
       payload: Prisma.$FestaGalleryImagePayload<ExtArgs>
       fields: Prisma.FestaGalleryImageFieldRefs
@@ -1729,6 +1804,20 @@ export const SponsorScalarFieldEnum = {
 export type SponsorScalarFieldEnum = (typeof SponsorScalarFieldEnum)[keyof typeof SponsorScalarFieldEnum]
 
 
+export const AttractionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  imageUrl: 'imageUrl',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AttractionScalarFieldEnum = (typeof AttractionScalarFieldEnum)[keyof typeof AttractionScalarFieldEnum]
+
+
 export const FestaGalleryImageScalarFieldEnum = {
   id: 'id',
   url: 'url',
@@ -1996,6 +2085,7 @@ export type GlobalOmitConfig = {
   cashier?: Prisma.CashierOmit
   tokenSale?: Prisma.TokenSaleOmit
   sponsor?: Prisma.SponsorOmit
+  attraction?: Prisma.AttractionOmit
   festaGalleryImage?: Prisma.FestaGalleryImageOmit
   festaSiteConfig?: Prisma.FestaSiteConfigOmit
 }

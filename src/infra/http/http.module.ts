@@ -17,9 +17,12 @@ import { ReportController } from "./controllers/reports.controller";
 import { ResetPricesController } from "@/services/reset.controller";
 import { ResetPricesService } from "@/services/reset-prices.service";
 import { SponsorsController } from "./controllers/sponsors.controller";
+import { AttractionsController } from "./controllers/attractions.controller";
 import { SponsorService } from "@/services/sponsor.service";
+import { AttractionsService } from "@/services/attractions.service";
 import { FestaSitePublicController } from "./controllers/festa-site-public.controller";
 import { AdminSponsorsController } from "./controllers/admin-sponsors.controller";
+import { AdminAttractionsController } from "./controllers/admin-attractions.controller";
 import { AdminFestaGalleryController } from "./controllers/admin-festa-gallery.controller";
 import { AdminFestaSiteConfigController } from "./controllers/admin-festa-site-config.controller";
 import { AdminSiteUploadController } from "./controllers/admin-site-upload.controller";
@@ -44,8 +47,10 @@ import { ManagerRbacService } from "@/services/manager-rbac.service";
     ReportController,
     ResetPricesController,
     SponsorsController,
+    AttractionsController,
     FestaSitePublicController,
     AdminSponsorsController,
+    AdminAttractionsController,
     AdminFestaGalleryController,
     AdminFestaSiteConfigController,
     AdminSiteUploadController,
@@ -63,6 +68,7 @@ import { ManagerRbacService } from "@/services/manager-rbac.service";
     ReportService,
     ResetPricesService,
     SponsorService,
+    AttractionsService,
     FestaGalleryService,
     FestaSiteConfigService,
     FestaS3Service,

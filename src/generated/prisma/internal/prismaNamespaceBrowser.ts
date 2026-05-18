@@ -64,6 +64,7 @@ export const ModelName = {
   Cashier: 'Cashier',
   TokenSale: 'TokenSale',
   Sponsor: 'Sponsor',
+  Attraction: 'Attraction',
   FestaGalleryImage: 'FestaGalleryImage',
   FestaSiteConfig: 'FestaSiteConfig'
 } as const
@@ -244,6 +245,20 @@ export const SponsorScalarFieldEnum = {
 } as const
 
 export type SponsorScalarFieldEnum = (typeof SponsorScalarFieldEnum)[keyof typeof SponsorScalarFieldEnum]
+
+
+export const AttractionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  imageUrl: 'imageUrl',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AttractionScalarFieldEnum = (typeof AttractionScalarFieldEnum)[keyof typeof AttractionScalarFieldEnum]
 
 
 export const FestaGalleryImageScalarFieldEnum = {

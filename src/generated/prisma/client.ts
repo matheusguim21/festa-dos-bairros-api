@@ -105,6 +105,11 @@ export type TokenSale = Prisma.TokenSaleModel
  */
 export type Sponsor = Prisma.SponsorModel
 /**
+ * Model Attraction
+ * 
+ */
+export type Attraction = Prisma.AttractionModel
+/**
  * Model FestaGalleryImage
  * 
  */

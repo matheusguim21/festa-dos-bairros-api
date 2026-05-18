@@ -1,7 +1,12 @@
 /// <reference types="bun-types" />
+import {
+  CloudFrontClient,
+  CreateInvalidationCommand,
+} from "@aws-sdk/client-cloudfront";
 import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { S3Client } from "bun";
+import { randomUUID } from "node:crypto";
 import type { Env } from "@/infra/env";
 
 @Injectable()
@@ -83,13 +88,111 @@ export class FestaS3Service {
     return null;
   }
 
+  /**
+   * Reverte URL pública para chave no bucket festa,
+   * apenas para `festa-site/gallery/...` (evita apagar URLs externas).
+   */
+  extractGalleryKeyFromPublicUrl(url: string | null | undefined): string | null {
+    if (!url?.trim()) return null;
+    const u = url.trim();
+    const publicBase = this.config
+      .get("AWS_S3_FESTA_PUBLIC_BASE_URL", { infer: true })
+      ?.trim()
+      .replace(/\/$/, "");
+    if (publicBase && u.startsWith(`${publicBase}/`)) {
+      const key = (u.slice(publicBase.length + 1).split("?")[0] ?? "").trim();
+      return key.startsWith("festa-site/gallery/") ? key : null;
+    }
+    const bucket = this.config.get("AWS_S3_FESTA_BUCKET", { infer: true });
+    const region = this.config.get("AWS_REGION", { infer: true });
+    if (!bucket || !region) return null;
+    const s3Prefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
+    if (u.startsWith(s3Prefix)) {
+      const key = u.slice(s3Prefix.length).split("?")[0] ?? "";
+      return key.startsWith("festa-site/gallery/") ? key : null;
+    }
+    return null;
+  }
+
+  /**
+   * Reverte URL pública para chave no bucket festa,
+   * apenas para `festa-site/attractions/...` (evita apagar URLs externas).
+   */
+  extractAttractionImageKeyFromPublicUrl(
+    url: string | null | undefined,
+  ): string | null {
+    if (!url?.trim()) return null;
+    const u = url.trim();
+    const publicBase = this.config
+      .get("AWS_S3_FESTA_PUBLIC_BASE_URL", { infer: true })
+      ?.trim()
+      .replace(/\/$/, "");
+    if (publicBase && u.startsWith(`${publicBase}/`)) {
+      const key = u.slice(publicBase.length + 1);
+      return key.startsWith("festa-site/attractions/") ? key : null;
+    }
+    const bucket = this.config.get("AWS_S3_FESTA_BUCKET", { infer: true });
+    const region = this.config.get("AWS_REGION", { infer: true });
+    if (!bucket || !region) return null;
+    const s3Prefix = `https://${bucket}.s3.${region}.amazonaws.com/`;
+    if (u.startsWith(s3Prefix)) {
+      const key = u.slice(s3Prefix.length).split("?")[0] ?? "";
+      return key.startsWith("festa-site/attractions/") ? key : null;
+    }
+    return null;
+  }
+
   /** Apaga objeto no bucket festa; ignora se S3 não estiver configurado ou falhar. */
   async tryDeletePublicObject(key: string): Promise<void> {
     if (!this.client || !key.startsWith("festa-site/")) return;
     try {
       await this.client.file(key).delete();
+      await this.tryInvalidateCloudFrontPaths([`/${key}`]);
     } catch (e) {
       this.logger.warn(`Não foi possível apagar objeto S3: ${key}`, e);
+    }
+  }
+
+  /**
+   * Invalida paths no CloudFront (opcional). Requer AWS_CLOUDFRONT_DISTRIBUTION_ID.
+   * API do CloudFront é global (us-east-1).
+   */
+  async tryInvalidateCloudFrontPaths(paths: string[]): Promise<void> {
+    const distributionId = this.config
+      .get("AWS_CLOUDFRONT_DISTRIBUTION_ID", { infer: true })
+      ?.trim();
+    if (!distributionId || paths.length === 0) return;
+
+    const accessKeyId = this.config.get("AWS_ACCESS_KEY_ID", { infer: true });
+    const secretAccessKey = this.config.get("AWS_SECRET_ACCESS_KEY", {
+      infer: true,
+    });
+    if (!accessKeyId || !secretAccessKey) return;
+
+    const items = paths.map((p) => (p.startsWith("/") ? p : `/${p}`));
+
+    try {
+      const client = new CloudFrontClient({
+        region: "us-east-1",
+        credentials: { accessKeyId, secretAccessKey },
+      });
+      await client.send(
+        new CreateInvalidationCommand({
+          DistributionId: distributionId,
+          InvalidationBatch: {
+            CallerReference: `festa-${Date.now()}-${randomUUID()}`,
+            Paths: {
+              Quantity: items.length,
+              Items: items,
+            },
+          },
+        }),
+      );
+    } catch (e) {
+      this.logger.warn(
+        `Não foi possível invalidar CloudFront (${items.join(", ")}):`,
+        e,
+      );
     }
   }
 }

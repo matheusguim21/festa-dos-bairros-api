@@ -46,16 +46,23 @@ export class AdminSiteUploadController {
       throw new BadRequestException("Arquivo obrigatório no campo file");
     }
     const purpose = body?.purpose ?? "gallery";
-    if (purpose !== "gallery" && purpose !== "sponsor" && purpose !== "video") {
+    if (
+      purpose !== "gallery" &&
+      purpose !== "sponsor" &&
+      purpose !== "attraction" &&
+      purpose !== "video"
+    ) {
       throw new BadRequestException(
-        "purpose deve ser gallery, sponsor ou video",
+        "purpose deve ser gallery, sponsor, attraction ou video",
       );
     }
     if (purpose === "video" && !VIDEO_MIME.has(file.mimetype)) {
       throw new BadRequestException("Vídeo deve ser MP4 ou WebM");
     }
     if (
-      (purpose === "gallery" || purpose === "sponsor") &&
+      (purpose === "gallery" ||
+        purpose === "sponsor" ||
+        purpose === "attraction") &&
       !IMAGE_MIME.has(file.mimetype)
     ) {
       throw new BadRequestException("Imagem deve ser JPEG, PNG, WebP ou GIF");
@@ -66,7 +73,9 @@ export class AdminSiteUploadController {
         ? "festa-site/video"
         : purpose === "sponsor"
           ? "festa-site/sponsors"
-          : "festa-site/gallery";
+          : purpose === "attraction"
+            ? "festa-site/attractions"
+            : "festa-site/gallery";
 
     let uploadBuffer: Buffer;
     let contentType: string;

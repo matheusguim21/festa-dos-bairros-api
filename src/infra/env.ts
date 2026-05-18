@@ -19,6 +19,8 @@ export const envSchema = z.object({
   AWS_S3_FESTA_BUCKET: z.string().optional(),
   /** Opcional: URL base (ex. CloudFront) sem barra final; se vazio, usa virtual-hosted S3 */
   AWS_S3_FESTA_PUBLIC_BASE_URL: z.string().url().optional(),
+  /** Opcional: ID da distribuição CloudFront para invalidar cache após apagar objeto no S3 */
+  AWS_CLOUDFRONT_DISTRIBUTION_ID: z.string().optional(),
 })
 
 export type Env = z.infer<typeof envSchema>
