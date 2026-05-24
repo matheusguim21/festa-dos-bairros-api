@@ -17,13 +17,13 @@ import { ZodValidationPipe } from "../pipes/zod-validation-pipe";
 
 const createGallerySchema = z.object({
   url: z.string().url(),
-  alt: z.string().min(1),
+  alt: z.string().optional(),
   displayOrder: z.number().int().optional(),
 });
 
 const updateGallerySchema = z.object({
   url: z.string().url().optional(),
-  alt: z.string().min(1).optional(),
+  alt: z.string().optional(),
   displayOrder: z.number().int().optional(),
   isActive: z.boolean().optional(),
 });

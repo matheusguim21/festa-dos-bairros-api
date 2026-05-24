@@ -30,11 +30,11 @@ export class FestaGalleryService {
     });
   }
 
-  async create(data: { url: string; alt: string; displayOrder?: number }) {
+  async create(data: { url: string; alt?: string; displayOrder?: number }) {
     return this.prisma.festaGalleryImage.create({
       data: {
         url: data.url,
-        alt: data.alt,
+        alt: (data.alt ?? "").trim(),
         displayOrder: data.displayOrder ?? 0,
       },
     });
