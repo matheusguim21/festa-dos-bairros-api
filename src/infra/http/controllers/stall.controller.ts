@@ -21,16 +21,9 @@ import { Stall } from "@/generated/prisma/client";
 const updateStallBodySchema = z
   .object({
     name: z.string().min(1).max(200).optional(),
-    imageUrl: z
-      .union([z.string().url().max(2048), z.literal(""), z.null()])
-      .optional(),
   })
-  .transform((d) => ({
-    ...d,
-    imageUrl: d.imageUrl === "" ? null : d.imageUrl,
-  }))
-  .refine((d) => d.name !== undefined || d.imageUrl !== undefined, {
-    message: "Informe ao menos o nome ou a URL da imagem",
+  .refine((d) => d.name !== undefined, {
+    message: "Informe o nome",
   });
 
 const createStallSchema = z.object({
@@ -38,7 +31,6 @@ const createStallSchema = z.object({
   stallHolderName: z.string(),
   username: z.string(),
   password: z.string(),
-  imageUrl: z.string().max(2048).optional().nullable(),
 });
 
 export type CreateStallRequest = z.infer<typeof createStallSchema>;

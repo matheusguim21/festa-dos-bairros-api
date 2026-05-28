@@ -1,171 +1,171 @@
 // prisma/seed.ts
-import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Role } from "../src/generated/prisma/client";
-import { hash } from "bcryptjs";
-import { ensureRbacInfrastructure } from "./rbac-seed";
-import { legacyAppRoleSlug } from "../src/infra/rbac/rbac-defaults";
+import 'dotenv/config'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient, Role } from '../src/generated/prisma/client'
+import { hash } from 'bcryptjs'
+import { ensureRbacInfrastructure } from './rbac-seed'
+import { legacyAppRoleSlug } from '../src/infra/rbac/rbac-defaults'
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
-  throw new Error("DATABASE_URL is not set");
+  throw new Error('DATABASE_URL is not set')
 }
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
-});
+})
 
 type StallConfig = {
-  name: string;
-  username: string;
-  password: string;
-  role?: Role;
-  products?: Array<{ name: string; price: number; quantity: number }>;
-};
+  name: string
+  username: string
+  password: string
+  role?: Role
+  products?: Array<{ name: string; price: number; quantity: number }>
+}
 
 const stallsWithProducts: StallConfig[] = [
   // contas globais
   {
-    name: "Matheus",
-    username: "matheus",
-    password: "admin2025",
+    name: 'Matheus',
+    username: 'matheus',
+    password: 'matheus2026',
     role: Role.ADMIN,
   },
   {
-    name: "Andreia",
-    username: "andreia",
-    password: "admin2025",
+    name: 'Andreia',
+    username: 'andreia',
+    password: 'andreia2026',
     role: Role.ADMIN,
   },
   {
-    name: "Márcia",
-    username: "marcia",
-    password: "admin2025",
+    name: 'Márcia',
+    username: 'marcia',
+    password: 'marcia2026',
     role: Role.ADMIN,
   },
   {
-    name: "Pr. Marcelo",
-    username: "pastor",
-    password: "admin2025",
+    name: 'Pr. Marcelo',
+    username: 'marcelo',
+    password: 'marcelo2026',
     role: Role.ADMIN,
   },
 
   // barracas com produtos e quantidades atualizadas
   {
-    name: "Retiro (BATATA FRITA)",
-    username: "retiro",
-    password: "senha123",
+    name: 'Retiro (BATATA FRITA)',
+    username: 'retiro',
+    password: 'senha123',
     products: [
       {
-        name: "Batata grande com cheddar e calabresa",
+        name: 'Batata grande com cheddar e calabresa',
         price: 20.0,
         quantity: 60,
       },
-      { name: "Batata pequena", price: 10.0, quantity: 120 },
+      { name: 'Batata pequena', price: 10.0, quantity: 120 },
     ],
   },
   {
-    name: "5 Marias (CHURRASCO)",
-    username: "5marias",
-    password: "senha123",
+    name: '5 Marias (CHURRASCO)',
+    username: '5marias',
+    password: 'senha123',
     products: [
-      { name: "Carne", price: 10.0, quantity: 148 },
-      { name: "Misto", price: 9.0, quantity: 98 },
-      { name: "Frango", price: 8.0, quantity: 96 },
-      { name: "Salsichão", price: 7.0, quantity: 70 },
-      { name: "Queijo coalho", price: 10.0, quantity: 20 },
+      { name: 'Carne', price: 10.0, quantity: 148 },
+      { name: 'Misto', price: 9.0, quantity: 98 },
+      { name: 'Frango', price: 8.0, quantity: 96 },
+      { name: 'Salsichão', price: 7.0, quantity: 70 },
+      { name: 'Queijo coalho', price: 10.0, quantity: 20 },
     ],
   },
   {
-    name: "Pedra (JAPA)",
-    username: "pedra",
-    password: "senha123",
+    name: 'Pedra (JAPA)',
+    username: 'pedra',
+    password: 'senha123',
     products: [
-      { name: "Hot filadélfia", price: 20.0, quantity: 400 },
-      { name: "Yakisoba carne", price: 18.0, quantity: 46 },
-      { name: "Yakisoba frango", price: 15.0, quantity: 50 },
+      { name: 'Hot filadélfia', price: 20.0, quantity: 400 },
+      { name: 'Yakisoba carne', price: 18.0, quantity: 46 },
+      { name: 'Yakisoba frango', price: 15.0, quantity: 50 },
     ],
   },
   {
-    name: "Brisa (HAMBURGUER)",
-    username: "brisa",
-    password: "senha123",
+    name: 'Brisa (HAMBURGUER)',
+    username: 'brisa',
+    password: 'senha123',
     products: [
-      { name: "Pancho (pão com linguiça e queijo)", price: 12.0, quantity: 40 },
-      { name: "Cheddar Melt artesanal", price: 25.0, quantity: 47 },
-      { name: "Hamburguer tradicional (x-bacon)", price: 12.0, quantity: 40 },
-      { name: "Hamburguer tradicional duplo", price: 18.0, quantity: 10 },
+      { name: 'Pancho (pão com linguiça e queijo)', price: 12.0, quantity: 40 },
+      { name: 'Cheddar Melt artesanal', price: 25.0, quantity: 47 },
+      { name: 'Hamburguer tradicional (x-bacon)', price: 12.0, quantity: 40 },
+      { name: 'Hamburguer tradicional duplo', price: 18.0, quantity: 10 },
     ],
   },
   {
-    name: "Catruz (DOCES)",
-    username: "catruz",
-    password: "senha123",
+    name: 'Catruz (DOCES)',
+    username: 'catruz',
+    password: 'senha123',
     products: [
-      { name: "Torta de limão", price: 12.0, quantity: 50 },
-      { name: "Bolo de cenoura", price: 8.0, quantity: 50 },
-      { name: "Bolo de aipim", price: 7.0, quantity: 20 },
-      { name: "Banofe", price: 12.0, quantity: 110 },
-      { name: "Torta de chocolate", price: 12.0, quantity: 30 },
-      { name: "Cuzcuz", price: 7.0, quantity: 50 },
-      { name: "Bolo de milho", price: 7.0, quantity: 30 },
+      { name: 'Torta de limão', price: 12.0, quantity: 50 },
+      { name: 'Bolo de cenoura', price: 8.0, quantity: 50 },
+      { name: 'Bolo de aipim', price: 7.0, quantity: 20 },
+      { name: 'Banofe', price: 12.0, quantity: 110 },
+      { name: 'Torta de chocolate', price: 12.0, quantity: 30 },
+      { name: 'Cuzcuz', price: 7.0, quantity: 50 },
+      { name: 'Bolo de milho', price: 7.0, quantity: 30 },
       // Pudim não foi citado, fica com estoque default 10:
-      { name: "Pudim", price: 8.0, quantity: 10 },
+      { name: 'Pudim', price: 8.0, quantity: 10 },
     ],
   },
   {
-    name: "Jardim Luana (PASTEL)",
-    username: "jardimluana",
-    password: "senha123",
+    name: 'Jardim Luana (PASTEL)',
+    username: 'jardimluana',
+    password: 'senha123',
     products: [
-      { name: "Camarão", price: 13.0, quantity: 50 },
-      { name: "Carne", price: 10.0, quantity: 50 },
-      { name: "Queijo", price: 10.0, quantity: 50 },
-      { name: "Pizza", price: 10.0, quantity: 20 },
-      { name: "Frango", price: 10.0, quantity: 30 },
+      { name: 'Camarão', price: 13.0, quantity: 50 },
+      { name: 'Carne', price: 10.0, quantity: 50 },
+      { name: 'Queijo', price: 10.0, quantity: 50 },
+      { name: 'Pizza', price: 10.0, quantity: 20 },
+      { name: 'Frango', price: 10.0, quantity: 30 },
     ],
   },
   {
-    name: "Jardim Guaratiba (CALDOS)",
-    username: "jardimguaratiba",
-    password: "senha123",
+    name: 'Jardim Guaratiba (CALDOS)',
+    username: 'jardimguaratiba',
+    password: 'senha123',
     products: [
-      { name: "Caldo de Aipim com carne seca", price: 16.0, quantity: 30 },
-      { name: "Caldo de mocotó", price: 16.0, quantity: 30 },
-      { name: "Caldo Verde", price: 14.0, quantity: 30 },
-      { name: "Canjica", price: 12.0, quantity: 30 },
-      { name: "Milho verde", price: 7.0, quantity: 80 },
+      { name: 'Caldo de Aipim com carne seca', price: 16.0, quantity: 30 },
+      { name: 'Caldo de mocotó', price: 16.0, quantity: 30 },
+      { name: 'Caldo Verde', price: 14.0, quantity: 30 },
+      { name: 'Canjica', price: 12.0, quantity: 30 },
+      { name: 'Milho verde', price: 7.0, quantity: 80 },
     ],
   },
   {
     name: "Pingo D'água (BEBIDAS)",
-    username: "pingodagua",
-    password: "senha123",
+    username: 'pingodagua',
+    password: 'senha123',
     products: [
-      { name: "Guaracamp 250ml", price: 3.0, quantity: 240 },
-      { name: "Refrigerante 350 ml", price: 7.0, quantity: 120 },
-      { name: "Coquetel 400ml", price: 8.0, quantity: 60 },
-      { name: "Água mineral 500 ml", price: 2.0, quantity: 36 },
+      { name: 'Guaracamp 250ml', price: 3.0, quantity: 240 },
+      { name: 'Refrigerante 350 ml', price: 7.0, quantity: 120 },
+      { name: 'Coquetel 400ml', price: 8.0, quantity: 60 },
+      { name: 'Água mineral 500 ml', price: 2.0, quantity: 36 },
       // novos itens de bebida
-      { name: "Café", price: 5.0, quantity: 50 },
-      { name: "Chocolate quente", price: 6.0, quantity: 50 },
+      { name: 'Café', price: 5.0, quantity: 50 },
+      { name: 'Chocolate quente', price: 6.0, quantity: 50 },
     ],
   },
   {
-    name: "Cabuís (AÇAÍ)",
-    username: "cabuis",
-    password: "senha123",
+    name: 'Cabuís (AÇAÍ)',
+    username: 'cabuis',
+    password: 'senha123',
     products: [
-      { name: "Açaí 300ml", price: 12.0, quantity: 40 },
-      { name: "Açaí 400ml", price: 14.0, quantity: 30 },
+      { name: 'Açaí 300ml', price: 12.0, quantity: 40 },
+      { name: 'Açaí 400ml', price: 14.0, quantity: 30 },
     ],
   },
-];
+]
 
 async function main() {
-  await ensureRbacInfrastructure(prisma);
+  await ensureRbacInfrastructure(prisma)
 
   for (const stall of stallsWithProducts) {
-    const hashedPassword = await hash(stall.password, 10);
+    const hashedPassword = await hash(stall.password, 10)
 
     // contas de administrador global
     if (!stall.products) {
@@ -177,8 +177,8 @@ async function main() {
           role: stall.role!,
           appRole: { connect: { slug: legacyAppRoleSlug(stall.role!) } },
         },
-      });
-      continue;
+      })
+      continue
     }
 
     // contas STALL_ADMIN com criação da barraca + produtos
@@ -192,18 +192,18 @@ async function main() {
         stall: {
           create: {
             name: stall.name,
-            products: {
-              create: stall.products.map((p) => ({
-                name: p.name,
-                price: p.price,
-                quantity: p.quantity,
-              })),
-            },
+            // products: {
+            //   create: stall.products.map((p) => ({
+            //     name: p.name,
+            //     price: p.price,
+            //     quantity: p.quantity,
+            //   })),
+            // },
           },
         },
       },
       include: { stall: true },
-    });
+    })
 
     // conta adicional para cada barraca
     await prisma.user.create({
@@ -217,36 +217,15 @@ async function main() {
           connect: { id: createdUser.stall!.id },
         },
       },
-    });
+    })
   }
 
-  const sponsorCount = await prisma.sponsor.count();
-  if (sponsorCount === 0) {
-    await prisma.sponsor.createMany({
-      data: [
-        {
-          name: "Patrocinador exemplo 1",
-          logoUrl: "https://picsum.photos/seed/fdb1/320/120",
-          websiteUrl: "https://example.com",
-          displayOrder: 0,
-          isActive: true,
-        },
-        {
-          name: "Patrocinador exemplo 2",
-          logoUrl: "https://picsum.photos/seed/fdb2/320/120",
-          displayOrder: 1,
-          isActive: true,
-        },
-      ],
-    });
-  }
-
-  console.log("🌱 Seed executado com sucesso!");
+  console.log('🌱 Seed executado com sucesso!')
 }
 
 main()
   .catch((e) => {
-    console.error("Erro ao rodar seed:", e);
-    process.exit(1);
+    console.error('Erro ao rodar seed:', e)
+    process.exit(1)
   })
-  .finally(() => prisma.$disconnect());
+  .finally(() => prisma.$disconnect())

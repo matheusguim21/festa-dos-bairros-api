@@ -78,8 +78,6 @@ model AppRoleScreen {
 model Stall {
   id        Int      @id @default(autoincrement())
   name      String
-  /// URL pública da imagem da barraca (ex. CloudFront/S3)
-  imageUrl  String?
   users     User[]                    // 🔸 1:N relação reversa
   products  Product[]
   orders    Order[]

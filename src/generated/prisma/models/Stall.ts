@@ -37,19 +37,16 @@ export type StallSumAggregateOutputType = {
 export type StallMinAggregateOutputType = {
   id: number | null
   name: string | null
-  imageUrl: string | null
 }
 
 export type StallMaxAggregateOutputType = {
   id: number | null
   name: string | null
-  imageUrl: string | null
 }
 
 export type StallCountAggregateOutputType = {
   id: number
   name: number
-  imageUrl: number
   _all: number
 }
 
@@ -65,19 +62,16 @@ export type StallSumAggregateInputType = {
 export type StallMinAggregateInputType = {
   id?: true
   name?: true
-  imageUrl?: true
 }
 
 export type StallMaxAggregateInputType = {
   id?: true
   name?: true
-  imageUrl?: true
 }
 
 export type StallCountAggregateInputType = {
   id?: true
   name?: true
-  imageUrl?: true
   _all?: true
 }
 
@@ -170,7 +164,6 @@ export type StallGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type StallGroupByOutputType = {
   id: number
   name: string
-  imageUrl: string | null
   _count: StallCountAggregateOutputType | null
   _avg: StallAvgAggregateOutputType | null
   _sum: StallSumAggregateOutputType | null
@@ -199,7 +192,6 @@ export type StallWhereInput = {
   NOT?: Prisma.StallWhereInput | Prisma.StallWhereInput[]
   id?: Prisma.IntFilter<"Stall"> | number
   name?: Prisma.StringFilter<"Stall"> | string
-  imageUrl?: Prisma.StringNullableFilter<"Stall"> | string | null
   users?: Prisma.UserListRelationFilter
   products?: Prisma.ProductListRelationFilter
   orders?: Prisma.OrderListRelationFilter
@@ -208,7 +200,6 @@ export type StallWhereInput = {
 export type StallOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
   products?: Prisma.ProductOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
@@ -220,7 +211,6 @@ export type StallWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.StallWhereInput[]
   NOT?: Prisma.StallWhereInput | Prisma.StallWhereInput[]
   name?: Prisma.StringFilter<"Stall"> | string
-  imageUrl?: Prisma.StringNullableFilter<"Stall"> | string | null
   users?: Prisma.UserListRelationFilter
   products?: Prisma.ProductListRelationFilter
   orders?: Prisma.OrderListRelationFilter
@@ -229,7 +219,6 @@ export type StallWhereUniqueInput = Prisma.AtLeast<{
 export type StallOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.StallCountOrderByAggregateInput
   _avg?: Prisma.StallAvgOrderByAggregateInput
   _max?: Prisma.StallMaxOrderByAggregateInput
@@ -243,12 +232,10 @@ export type StallScalarWhereWithAggregatesInput = {
   NOT?: Prisma.StallScalarWhereWithAggregatesInput | Prisma.StallScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Stall"> | number
   name?: Prisma.StringWithAggregatesFilter<"Stall"> | string
-  imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Stall"> | string | null
 }
 
 export type StallCreateInput = {
   name: string
-  imageUrl?: string | null
   users?: Prisma.UserCreateNestedManyWithoutStallInput
   products?: Prisma.ProductCreateNestedManyWithoutStallInput
   orders?: Prisma.OrderCreateNestedManyWithoutStallInput
@@ -257,7 +244,6 @@ export type StallCreateInput = {
 export type StallUncheckedCreateInput = {
   id?: number
   name: string
-  imageUrl?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutStallInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutStallInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStallInput
@@ -265,7 +251,6 @@ export type StallUncheckedCreateInput = {
 
 export type StallUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutStallNestedInput
   products?: Prisma.ProductUpdateManyWithoutStallNestedInput
   orders?: Prisma.OrderUpdateManyWithoutStallNestedInput
@@ -274,7 +259,6 @@ export type StallUpdateInput = {
 export type StallUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutStallNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutStallNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStallNestedInput
@@ -283,18 +267,15 @@ export type StallUncheckedUpdateInput = {
 export type StallCreateManyInput = {
   id?: number
   name: string
-  imageUrl?: string | null
 }
 
 export type StallUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type StallUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type StallNullableScalarRelationFilter = {
@@ -305,7 +286,6 @@ export type StallNullableScalarRelationFilter = {
 export type StallCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  imageUrl?: Prisma.SortOrder
 }
 
 export type StallAvgOrderByAggregateInput = {
@@ -315,13 +295,11 @@ export type StallAvgOrderByAggregateInput = {
 export type StallMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  imageUrl?: Prisma.SortOrder
 }
 
 export type StallMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  imageUrl?: Prisma.SortOrder
 }
 
 export type StallSumOrderByAggregateInput = {
@@ -379,7 +357,6 @@ export type StallUpdateOneRequiredWithoutOrdersNestedInput = {
 
 export type StallCreateWithoutUsersInput = {
   name: string
-  imageUrl?: string | null
   products?: Prisma.ProductCreateNestedManyWithoutStallInput
   orders?: Prisma.OrderCreateNestedManyWithoutStallInput
 }
@@ -387,7 +364,6 @@ export type StallCreateWithoutUsersInput = {
 export type StallUncheckedCreateWithoutUsersInput = {
   id?: number
   name: string
-  imageUrl?: string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutStallInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStallInput
 }
@@ -410,7 +386,6 @@ export type StallUpdateToOneWithWhereWithoutUsersInput = {
 
 export type StallUpdateWithoutUsersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUpdateManyWithoutStallNestedInput
   orders?: Prisma.OrderUpdateManyWithoutStallNestedInput
 }
@@ -418,14 +393,12 @@ export type StallUpdateWithoutUsersInput = {
 export type StallUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutStallNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStallNestedInput
 }
 
 export type StallCreateWithoutProductsInput = {
   name: string
-  imageUrl?: string | null
   users?: Prisma.UserCreateNestedManyWithoutStallInput
   orders?: Prisma.OrderCreateNestedManyWithoutStallInput
 }
@@ -433,7 +406,6 @@ export type StallCreateWithoutProductsInput = {
 export type StallUncheckedCreateWithoutProductsInput = {
   id?: number
   name: string
-  imageUrl?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutStallInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutStallInput
 }
@@ -456,7 +428,6 @@ export type StallUpdateToOneWithWhereWithoutProductsInput = {
 
 export type StallUpdateWithoutProductsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutStallNestedInput
   orders?: Prisma.OrderUpdateManyWithoutStallNestedInput
 }
@@ -464,14 +435,12 @@ export type StallUpdateWithoutProductsInput = {
 export type StallUncheckedUpdateWithoutProductsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutStallNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutStallNestedInput
 }
 
 export type StallCreateWithoutOrdersInput = {
   name: string
-  imageUrl?: string | null
   users?: Prisma.UserCreateNestedManyWithoutStallInput
   products?: Prisma.ProductCreateNestedManyWithoutStallInput
 }
@@ -479,7 +448,6 @@ export type StallCreateWithoutOrdersInput = {
 export type StallUncheckedCreateWithoutOrdersInput = {
   id?: number
   name: string
-  imageUrl?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutStallInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutStallInput
 }
@@ -502,7 +470,6 @@ export type StallUpdateToOneWithWhereWithoutOrdersInput = {
 
 export type StallUpdateWithoutOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutStallNestedInput
   products?: Prisma.ProductUpdateManyWithoutStallNestedInput
 }
@@ -510,7 +477,6 @@ export type StallUpdateWithoutOrdersInput = {
 export type StallUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutStallNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutStallNestedInput
 }
@@ -567,7 +533,6 @@ export type StallCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Ex
 export type StallSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  imageUrl?: boolean
   users?: boolean | Prisma.Stall$usersArgs<ExtArgs>
   products?: boolean | Prisma.Stall$productsArgs<ExtArgs>
   orders?: boolean | Prisma.Stall$ordersArgs<ExtArgs>
@@ -577,22 +542,19 @@ export type StallSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
 export type StallSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  imageUrl?: boolean
 }, ExtArgs["result"]["stall"]>
 
 export type StallSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  imageUrl?: boolean
 }, ExtArgs["result"]["stall"]>
 
 export type StallSelectScalar = {
   id?: boolean
   name?: boolean
-  imageUrl?: boolean
 }
 
-export type StallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "imageUrl", ExtArgs["result"]["stall"]>
+export type StallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["stall"]>
 export type StallInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Stall$usersArgs<ExtArgs>
   products?: boolean | Prisma.Stall$productsArgs<ExtArgs>
@@ -612,10 +574,6 @@ export type $StallPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
-    /**
-     * URL pública da imagem da barraca (ex. CloudFront/S3)
-     */
-    imageUrl: string | null
   }, ExtArgs["result"]["stall"]>
   composites: {}
 }
@@ -1044,7 +1002,6 @@ export interface Prisma__StallClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface StallFieldRefs {
   readonly id: Prisma.FieldRef<"Stall", 'Int'>
   readonly name: Prisma.FieldRef<"Stall", 'String'>
-  readonly imageUrl: Prisma.FieldRef<"Stall", 'String'>
 }
     
 

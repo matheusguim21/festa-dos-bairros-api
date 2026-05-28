@@ -1692,8 +1692,7 @@ export type AppRoleScreenScalarFieldEnum = (typeof AppRoleScreenScalarFieldEnum)
 
 export const StallScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  imageUrl: 'imageUrl'
+  name: 'name'
 } as const
 
 export type StallScalarFieldEnum = (typeof StallScalarFieldEnum)[keyof typeof StallScalarFieldEnum]

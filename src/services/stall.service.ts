@@ -40,9 +40,6 @@ export class StallService {
       const stall = await this.prismaService.stall.create({
         data: {
           name: data.stallName,
-          ...(data.imageUrl != null && data.imageUrl !== ""
-            ? { imageUrl: data.imageUrl }
-            : {}),
         },
       });
 
@@ -52,7 +49,7 @@ export class StallService {
     }
   }
 
-  async update(id: number, data: { name?: string; imageUrl?: string | null }) {
+  async update(id: number, data: { name?: string }) {
     return this.prismaService.stall.update({
       where: { id },
       data,

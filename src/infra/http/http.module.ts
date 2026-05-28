@@ -35,6 +35,8 @@ import { AdminOrSelfGuard } from "../auth/admin-or-self.guard";
 import { AdminManagerScreensController } from "./controllers/admin-manager-screens.controller";
 import { AdminAppRolesController } from "./controllers/admin-app-roles.controller";
 import { ManagerRbacService } from "@/services/manager-rbac.service";
+import { AdminMenuImportController } from "./controllers/admin-menu-import.controller";
+import { MenuImportService } from "@/services/menu-import.service";
 
 @Module({
   controllers: [
@@ -56,6 +58,7 @@ import { ManagerRbacService } from "@/services/manager-rbac.service";
     AdminSiteUploadController,
     AdminManagerScreensController,
     AdminAppRolesController,
+    AdminMenuImportController,
   ],
   providers: [
     PrismaService,
@@ -76,6 +79,7 @@ import { ManagerRbacService } from "@/services/manager-rbac.service";
     AdminGuard,
     AdminOrSelfGuard,
     ManagerRbacService,
+    MenuImportService,
   ],
 })
 export class HttpModule {}
