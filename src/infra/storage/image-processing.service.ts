@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import sharp from "sharp";
 
-export type ImageUploadPurpose = "gallery" | "sponsor" | "attraction";
+export type ImageUploadPurpose =
+  | "gallery"
+  | "sponsor"
+  | "attraction"
+  | "product";
 
 export type ProcessedImage = {
   buffer: Buffer;
@@ -18,7 +22,11 @@ export class ImageProcessingService {
     purpose: ImageUploadPurpose,
   ): Promise<ProcessedImage> {
     const maxWidth =
-      purpose === "sponsor" || purpose === "attraction" ? 800 : 1920;
+      purpose === "sponsor" ||
+      purpose === "attraction" ||
+      purpose === "product"
+        ? 800
+        : 1920;
 
     try {
       const buffer = await sharp(input, { animated: false })

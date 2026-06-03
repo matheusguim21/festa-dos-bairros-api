@@ -82,6 +82,7 @@ export class ProductsService {
             ...(data.description !== undefined
               ? { description: data.description }
               : {}),
+            ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl } : {}),
             quantity:
               data.operation === "IN"
                 ? {
@@ -121,6 +122,7 @@ export class ProductsService {
         ...(data.description !== undefined
           ? { description: data.description }
           : {}),
+        ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl } : {}),
         criticalStock: data.criticalStock,
       },
       where: {
