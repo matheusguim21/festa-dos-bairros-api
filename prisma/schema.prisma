@@ -87,6 +87,7 @@ model Product {
   id             Int         @id @default(autoincrement())
   name           String
   description    String?     @db.Text
+  imageUrl       String?
   price          Float
   quantity       Int         @default(0)
   criticalStock  Int         @default(5) // ✅ novo campo

@@ -38,6 +38,7 @@ const createProductSchema = z.object({
   stallId: z.number(),
   criticalStock: z.number().optional(),
   description: z.string().max(50000).optional().nullable(),
+  imageUrl: z.string().url().max(2048).optional().nullable(),
 });
 const updateProductSchema = z.object({
   productId: z.number(),
@@ -47,6 +48,7 @@ const updateProductSchema = z.object({
   criticalStock: z.number().optional(),
   stallId: z.number().optional(),
   description: z.string().max(50000).optional().nullable(),
+  imageUrl: z.string().url().max(2048).optional().nullable(),
   operation: z.enum(["IN", "OUT", "NOONE"]),
 });
 const deleteProductSchema = z.coerce.number();
