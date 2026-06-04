@@ -27,10 +27,7 @@ const updateStallBodySchema = z
   });
 
 const createStallSchema = z.object({
-  stallName: z.string(),
-  stallHolderName: z.string(),
-  username: z.string(),
-  password: z.string(),
+  stallName: z.string().min(1).max(200),
 });
 
 export type CreateStallRequest = z.infer<typeof createStallSchema>;

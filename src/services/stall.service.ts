@@ -1,17 +1,10 @@
 import { PrismaService } from "@/infra/database/prisma/prisma.service";
 import { CreateStallRequest } from "@/infra/http/controllers/stall.controller";
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { Prisma } from "@/generated/prisma/client";
-import { hash } from "bcryptjs";
-import { AuthenticationService } from "./auth.service";
-import { UserService } from "./user.service";
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class StallService {
-  constructor(
-    private prismaService: PrismaService,
-    private userService: UserService
-  ) {}
+  constructor(private prismaService: PrismaService) {}
   async stallExists(stallId: number) {
     return await this.prismaService.stall.findUnique({
       where: {
