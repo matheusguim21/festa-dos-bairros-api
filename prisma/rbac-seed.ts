@@ -99,6 +99,8 @@ async function main() {
   }
 }
 
-if (import.meta.main) {
+const isDirectRun = process.argv[1]?.includes("rbac-seed");
+
+if (isDirectRun) {
   void main();
 }
