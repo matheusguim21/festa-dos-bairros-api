@@ -375,9 +375,9 @@ export type CashierSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type CashierScalarRelationFilter = {
-  is?: Prisma.CashierWhereInput
-  isNot?: Prisma.CashierWhereInput
+export type CashierNullableScalarRelationFilter = {
+  is?: Prisma.CashierWhereInput | null
+  isNot?: Prisma.CashierWhereInput | null
 }
 
 export type CashierCreateNestedOneWithoutTokenSalesInput = {
@@ -386,10 +386,12 @@ export type CashierCreateNestedOneWithoutTokenSalesInput = {
   connect?: Prisma.CashierWhereUniqueInput
 }
 
-export type CashierUpdateOneRequiredWithoutTokenSalesNestedInput = {
+export type CashierUpdateOneWithoutTokenSalesNestedInput = {
   create?: Prisma.XOR<Prisma.CashierCreateWithoutTokenSalesInput, Prisma.CashierUncheckedCreateWithoutTokenSalesInput>
   connectOrCreate?: Prisma.CashierCreateOrConnectWithoutTokenSalesInput
   upsert?: Prisma.CashierUpsertWithoutTokenSalesInput
+  disconnect?: Prisma.CashierWhereInput | boolean
+  delete?: Prisma.CashierWhereInput | boolean
   connect?: Prisma.CashierWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CashierUpdateToOneWithWhereWithoutTokenSalesInput, Prisma.CashierUpdateWithoutTokenSalesInput>, Prisma.CashierUncheckedUpdateWithoutTokenSalesInput>
 }

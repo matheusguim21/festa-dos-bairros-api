@@ -21,6 +21,8 @@ export const envSchema = z.object({
   AWS_S3_FESTA_PUBLIC_BASE_URL: z.string().url().optional(),
   /** Opcional: ID da distribuição CloudFront para invalidar cache após apagar objeto no S3 */
   AWS_CLOUDFRONT_DISTRIBUTION_ID: z.string().optional(),
+  /** Base URL da Evolution API (ex.: https://evolution.seudominio.com) — alertas WhatsApp */
+  EVOLUTION_API_BASE_URL: z.string().url().optional(),
 })
 
 export type Env = z.infer<typeof envSchema>

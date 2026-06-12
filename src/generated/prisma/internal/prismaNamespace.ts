@@ -396,10 +396,13 @@ export const ModelName = {
   StockOut: 'StockOut',
   Cashier: 'Cashier',
   TokenSale: 'TokenSale',
+  TokenSaleItem: 'TokenSaleItem',
   Sponsor: 'Sponsor',
   Attraction: 'Attraction',
   FestaGalleryImage: 'FestaGalleryImage',
-  FestaSiteConfig: 'FestaSiteConfig'
+  FestaSiteConfig: 'FestaSiteConfig',
+  FestaConfig: 'FestaConfig',
+  FestaAlertPhone: 'FestaAlertPhone'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "managerScreen" | "appRole" | "appRoleScreen" | "stall" | "product" | "order" | "orderItem" | "stockIn" | "stockOut" | "cashier" | "tokenSale" | "sponsor" | "attraction" | "festaGalleryImage" | "festaSiteConfig"
+    modelProps: "user" | "managerScreen" | "appRole" | "appRoleScreen" | "stall" | "product" | "order" | "orderItem" | "stockIn" | "stockOut" | "cashier" | "tokenSale" | "tokenSaleItem" | "sponsor" | "attraction" | "festaGalleryImage" | "festaSiteConfig" | "festaConfig" | "festaAlertPhone"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1307,6 +1310,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TokenSaleItem: {
+      payload: Prisma.$TokenSaleItemPayload<ExtArgs>
+      fields: Prisma.TokenSaleItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TokenSaleItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TokenSaleItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>
+        }
+        findFirst: {
+          args: Prisma.TokenSaleItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TokenSaleItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>
+        }
+        findMany: {
+          args: Prisma.TokenSaleItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>[]
+        }
+        create: {
+          args: Prisma.TokenSaleItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>
+        }
+        createMany: {
+          args: Prisma.TokenSaleItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TokenSaleItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>[]
+        }
+        delete: {
+          args: Prisma.TokenSaleItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>
+        }
+        update: {
+          args: Prisma.TokenSaleItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.TokenSaleItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TokenSaleItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TokenSaleItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.TokenSaleItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TokenSaleItemPayload>
+        }
+        aggregate: {
+          args: Prisma.TokenSaleItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTokenSaleItem>
+        }
+        groupBy: {
+          args: Prisma.TokenSaleItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TokenSaleItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TokenSaleItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TokenSaleItemCountAggregateOutputType> | number
+        }
+      }
+    }
     Sponsor: {
       payload: Prisma.$SponsorPayload<ExtArgs>
       fields: Prisma.SponsorFieldRefs
@@ -1603,6 +1680,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FestaConfig: {
+      payload: Prisma.$FestaConfigPayload<ExtArgs>
+      fields: Prisma.FestaConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FestaConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FestaConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.FestaConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FestaConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>
+        }
+        findMany: {
+          args: Prisma.FestaConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>[]
+        }
+        create: {
+          args: Prisma.FestaConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>
+        }
+        createMany: {
+          args: Prisma.FestaConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FestaConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.FestaConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>
+        }
+        update: {
+          args: Prisma.FestaConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.FestaConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FestaConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FestaConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.FestaConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.FestaConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFestaConfig>
+        }
+        groupBy: {
+          args: Prisma.FestaConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FestaConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FestaConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FestaConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    FestaAlertPhone: {
+      payload: Prisma.$FestaAlertPhonePayload<ExtArgs>
+      fields: Prisma.FestaAlertPhoneFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FestaAlertPhoneFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FestaAlertPhoneFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>
+        }
+        findFirst: {
+          args: Prisma.FestaAlertPhoneFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FestaAlertPhoneFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>
+        }
+        findMany: {
+          args: Prisma.FestaAlertPhoneFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>[]
+        }
+        create: {
+          args: Prisma.FestaAlertPhoneCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>
+        }
+        createMany: {
+          args: Prisma.FestaAlertPhoneCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FestaAlertPhoneCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>[]
+        }
+        delete: {
+          args: Prisma.FestaAlertPhoneDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>
+        }
+        update: {
+          args: Prisma.FestaAlertPhoneUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>
+        }
+        deleteMany: {
+          args: Prisma.FestaAlertPhoneDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FestaAlertPhoneUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FestaAlertPhoneUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>[]
+        }
+        upsert: {
+          args: Prisma.FestaAlertPhoneUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FestaAlertPhonePayload>
+        }
+        aggregate: {
+          args: Prisma.FestaAlertPhoneAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFestaAlertPhone>
+        }
+        groupBy: {
+          args: Prisma.FestaAlertPhoneGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FestaAlertPhoneGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FestaAlertPhoneCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FestaAlertPhoneCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1780,14 +2005,30 @@ export type CashierScalarFieldEnum = (typeof CashierScalarFieldEnum)[keyof typeo
 
 export const TokenSaleScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   cashierId: 'cashierId',
   buyerName: 'buyerName',
-  amountPaid: 'amountPaid',
+  total: 'total',
+  paymentMethod: 'paymentMethod',
+  amountReceived: 'amountReceived',
+  changeAmount: 'changeAmount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type TokenSaleScalarFieldEnum = (typeof TokenSaleScalarFieldEnum)[keyof typeof TokenSaleScalarFieldEnum]
+
+
+export const TokenSaleItemScalarFieldEnum = {
+  id: 'id',
+  tokenSaleId: 'tokenSaleId',
+  fichaValue: 'fichaValue',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  lineTotal: 'lineTotal'
+} as const
+
+export type TokenSaleItemScalarFieldEnum = (typeof TokenSaleItemScalarFieldEnum)[keyof typeof TokenSaleItemScalarFieldEnum]
 
 
 export const SponsorScalarFieldEnum = {
@@ -1840,6 +2081,30 @@ export const FestaSiteConfigScalarFieldEnum = {
 } as const
 
 export type FestaSiteConfigScalarFieldEnum = (typeof FestaSiteConfigScalarFieldEnum)[keyof typeof FestaSiteConfigScalarFieldEnum]
+
+
+export const FestaConfigScalarFieldEnum = {
+  id: 'id',
+  festivalDay1: 'festivalDay1',
+  festivalDay2: 'festivalDay2',
+  evolutionApiKey: 'evolutionApiKey',
+  evolutionInstanceName: 'evolutionInstanceName',
+  criticalStockAlertsEnabled: 'criticalStockAlertsEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FestaConfigScalarFieldEnum = (typeof FestaConfigScalarFieldEnum)[keyof typeof FestaConfigScalarFieldEnum]
+
+
+export const FestaAlertPhoneScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  label: 'label',
+  createdAt: 'createdAt'
+} as const
+
+export type FestaAlertPhoneScalarFieldEnum = (typeof FestaAlertPhoneScalarFieldEnum)[keyof typeof FestaAlertPhoneScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1960,6 +2225,20 @@ export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'OrderStatus[]'
  */
 export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentMethod'
+ */
+export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentMethod[]'
+ */
+export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
     
 
 /**
@@ -2084,10 +2363,13 @@ export type GlobalOmitConfig = {
   stockOut?: Prisma.StockOutOmit
   cashier?: Prisma.CashierOmit
   tokenSale?: Prisma.TokenSaleOmit
+  tokenSaleItem?: Prisma.TokenSaleItemOmit
   sponsor?: Prisma.SponsorOmit
   attraction?: Prisma.AttractionOmit
   festaGalleryImage?: Prisma.FestaGalleryImageOmit
   festaSiteConfig?: Prisma.FestaSiteConfigOmit
+  festaConfig?: Prisma.FestaConfigOmit
+  festaAlertPhone?: Prisma.FestaAlertPhoneOmit
 }
 
 /* Types for Logging */

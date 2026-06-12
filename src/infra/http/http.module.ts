@@ -37,6 +37,15 @@ import { AdminAppRolesController } from "./controllers/admin-app-roles.controlle
 import { ManagerRbacService } from "@/services/manager-rbac.service";
 import { AdminMenuImportController } from "./controllers/admin-menu-import.controller";
 import { MenuImportService } from "@/services/menu-import.service";
+import { TokenSaleController } from "./controllers/token-sale.controller";
+import { TokenSaleService } from "@/services/token-sale.service";
+import { DashboardController } from "./controllers/dashboard.controller";
+import { DashboardService } from "@/services/dashboard.service";
+import { FestaConfigController } from "./controllers/festa-config.controller";
+import { AdminFestaConfigController } from "./controllers/admin-festa-config.controller";
+import { FestaConfigService } from "@/services/festa-config.service";
+import { EvolutionApiService } from "@/services/evolution-api.service";
+import { CriticalStockAlertService } from "@/services/critical-stock-alert.service";
 
 @Module({
   controllers: [
@@ -59,6 +68,10 @@ import { MenuImportService } from "@/services/menu-import.service";
     AdminManagerScreensController,
     AdminAppRolesController,
     AdminMenuImportController,
+    TokenSaleController,
+    DashboardController,
+    FestaConfigController,
+    AdminFestaConfigController,
   ],
   providers: [
     PrismaService,
@@ -80,6 +93,11 @@ import { MenuImportService } from "@/services/menu-import.service";
     AdminOrSelfGuard,
     ManagerRbacService,
     MenuImportService,
+    TokenSaleService,
+    DashboardService,
+    FestaConfigService,
+    EvolutionApiService,
+    CriticalStockAlertService,
   ],
 })
 export class HttpModule {}

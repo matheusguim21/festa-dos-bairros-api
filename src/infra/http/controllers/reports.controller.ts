@@ -1,23 +1,47 @@
-// src/controllers/report.controller.ts
 import { GetBestSellingProductsFilter } from "@/dtos/getBestSellingProducts";
+import { JWTAuthGuard } from "@/infra/auth/jwt.auth-guard";
+import type { TokenPayload } from "@/infra/auth/jwt.strategy";
+import { resolveReportStallScope } from "@/infra/auth/resolve-report-stall-scope";
 import { ReportService } from "@/services/reports.service";
+import { UserService } from "@/services/user.service";
 import {
   Controller,
   DefaultValuePipe,
   Get,
   Logger,
+  NotFoundException,
   ParseIntPipe,
   Query,
+  Req,
   Res,
+  UnauthorizedException,
+  UseGuards,
 } from "@nestjs/common";
 import type { FastifyReply } from "fastify";
 
 @Controller("reports")
+@UseGuards(JWTAuthGuard)
 export class ReportController {
-  constructor(private reportService: ReportService) {}
+  constructor(
+    private reportService: ReportService,
+    private userService: UserService,
+  ) {}
+
+  private async resolveStallId(
+    userId: number,
+    stallId?: string,
+  ): Promise<number | undefined> {
+    const user = await this.userService.findUserById(userId);
+    if (!user) {
+      throw new NotFoundException("Usuário não encontrado");
+    }
+    const requestedStallId = stallId ? Number(stallId) : undefined;
+    return resolveReportStallScope(user, requestedStallId);
+  }
 
   @Get()
   async getBestSellingProducts(
+    @Req() req: { user?: TokenPayload },
     @Query("page", new DefaultValuePipe(0), ParseIntPipe) page: number,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query("search") search?: string,
@@ -29,15 +53,22 @@ export class ReportController {
       | "name"
       | "stock-asc"
       | "stock-desc" = "totalSold",
-    @Query("date") date?: string // apenas um parâmetro de data
+    @Query("date") date?: string,
   ) {
+    const userId = req.user?.user_id;
+    if (!userId) {
+      throw new UnauthorizedException("Usuário não autenticado");
+    }
+
+    const effectiveStallId = await this.resolveStallId(userId, stallId);
+
     const filters: GetBestSellingProductsFilter = {
       page,
       limit,
       search,
-      stallId: stallId ? Number(stallId) : undefined,
+      stallId: effectiveStallId,
       sortBy,
-      date, // undefined se não vier
+      date,
     };
 
     return this.reportService.getBestSellingProducts(filters);
@@ -45,6 +76,7 @@ export class ReportController {
 
   @Get("best-selling-products/excel")
   async downloadExcel(
+    @Req() req: { user?: TokenPayload },
     @Res() reply: FastifyReply,
     @Query("page", new DefaultValuePipe(0), ParseIntPipe) page: number,
     @Query("limit", new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -57,24 +89,30 @@ export class ReportController {
       | "name"
       | "stock-asc"
       | "stock-desc" = "totalSold",
-    @Query("date") date?: string
+    @Query("date") date?: string,
   ) {
+    const userId = req.user?.user_id;
+    if (!userId) {
+      throw new UnauthorizedException("Usuário não autenticado");
+    }
+
+    const effectiveStallId = await this.resolveStallId(userId, stallId);
+
     const filters: GetBestSellingProductsFilter = {
       page,
       limit,
       search,
-      stallId: stallId ? Number(stallId) : undefined,
+      stallId: effectiveStallId,
       sortBy,
       date,
     };
     Logger.log("Filters: ", filters);
 
     const buffer = await this.reportService.generateBestSellingProductsExcel(
-      filters
+      filters,
     );
     Logger.log("Gerando relatório Excel de mais vendidos");
 
-    // nome de arquivo: se date, usa data; senão, relatório completo
     const filename = date
       ? `produtos-mais-vendidos_${date}.xlsx`
       : `produtos-mais-vendidos-complete.xlsx`;
@@ -89,7 +127,14 @@ export class ReportController {
   }
 
   @Get("receita-total")
-  async getTotalRevenue() {
-    return this.reportService.getTotalRevenue();
+  async getTotalRevenue(@Req() req: { user?: TokenPayload }) {
+    const userId = req.user?.user_id;
+    if (!userId) {
+      throw new UnauthorizedException("Usuário não autenticado");
+    }
+
+    const effectiveStallId = await this.resolveStallId(userId);
+
+    return this.reportService.getTotalRevenue(effectiveStallId);
   }
 }

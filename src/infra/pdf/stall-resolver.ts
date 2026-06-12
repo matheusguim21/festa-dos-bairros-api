@@ -11,6 +11,8 @@ export const SEED_STALL_NAMES = [
   "Jardim Guaratiba (CALDOS)",
   "Pingo D'água (BEBIDAS)",
   "Cabuís (AÇAÍ)",
+  "Sepetiba (FICHAS)",
+  "TIROLESA",
 ] as const;
 
 export type SeedStallName = (typeof SEED_STALL_NAMES)[number];
@@ -28,6 +30,8 @@ export const PDF_STALL_LABEL_TO_SEED_NAME: Record<string, SeedStallName> = {
   brisa: "Brisa (HAMBURGUER)",
   "pingo d agua": "Pingo D'água (BEBIDAS)",
   "pingo dagua": "Pingo D'água (BEBIDAS)",
+  sepetiba: "Sepetiba (FICHAS)",
+  tirolesa: "TIROLESA",
 };
 
 export function normalizeStallKey(s: string): string {

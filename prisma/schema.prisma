@@ -28,6 +28,12 @@ enum OrderStatus {
   AWAITING_PAYMENT
 }
 
+enum PaymentMethod {
+  CASH
+  PIX
+  CARD
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -37,9 +43,10 @@ model User {
   stallId   Int?                     // 🔸 FK opcional
   stall     Stall?   @relation(fields: [stallId], references: [id])
   appRoleId Int?
-  appRole   AppRole? @relation(fields: [appRoleId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  appRole     AppRole?    @relation(fields: [appRoleId], references: [id])
+  tokenSales  TokenSale[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 /// Catálogo de telas do manager (chave estável alinhada ao front)
@@ -159,13 +166,33 @@ model Cashier {
 }
 
 model TokenSale {
+  id             Int              @id @default(autoincrement())
+  userId         Int?
+  user           User?            @relation(fields: [userId], references: [id])
+  cashierId      Int?
+  cashier        Cashier?         @relation(fields: [cashierId], references: [id])
+  buyerName      String?
+  total          Float
+  paymentMethod  PaymentMethod
+  amountReceived Float?
+  changeAmount   Float?
+  items          TokenSaleItem[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@map("venda_fichas")
+}
+
+model TokenSaleItem {
   id          Int       @id @default(autoincrement())
-  cashierId   Int
-  cashier     Cashier   @relation(fields: [cashierId], references: [id])
-  buyerName   String?
-  amountPaid  Float
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  tokenSaleId Int
+  tokenSale   TokenSale @relation(fields: [tokenSaleId], references: [id], onDelete: Cascade)
+  fichaValue  Float
+  quantity    Int
+  unitPrice   Float
+  lineTotal   Float
+
+  @@map("venda_ficha_itens")
 }
 
 model Sponsor {
@@ -206,4 +233,23 @@ model FestaSiteConfig {
   videoEmbedUrl String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+/// Configuração operacional da festa (use id = 1)
+model FestaConfig {
+  id                         Int      @id @default(1)
+  festivalDay1               String
+  festivalDay2               String
+  evolutionApiKey            String?
+  evolutionInstanceName      String?
+  criticalStockAlertsEnabled Boolean  @default(true)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
+model FestaAlertPhone {
+  id        Int      @id @default(autoincrement())
+  phone     String
+  label     String?
+  createdAt DateTime @default(now())
 }

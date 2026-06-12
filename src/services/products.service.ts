@@ -3,7 +3,8 @@ import {
   CreateProductRequest,
   UpdateProductRequest,
 } from "@/infra/http/controllers/products.controller";
-import { Injectable } from "@nestjs/common";
+import { CriticalStockAlertService } from "@/services/critical-stock-alert.service";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@/generated/prisma/client";
 
 interface FindAllProductsProps {
@@ -14,7 +15,10 @@ interface FindAllProductsProps {
 }
 @Injectable()
 export class ProductsService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private criticalStockAlertService: CriticalStockAlertService,
+  ) {}
 
   async findAllProducts({ skip, take, search, stallId }: FindAllProductsProps) {
     const where: Prisma.ProductWhereInput = {
@@ -74,6 +78,16 @@ export class ProductsService {
 
   async updateProduct(data: UpdateProductRequest) {
     if (data.operation !== "NOONE") {
+      const existing = await this.prismaService.product.findUnique({
+        where: { id: data.productId },
+        include: { stall: true },
+      });
+      if (!existing) {
+        throw new NotFoundException("Produto não encontrado");
+      }
+
+      const oldQty = existing.quantity;
+
       const [product] = await this.prismaService.$transaction([
         this.prismaService.product.update({
           data: {
@@ -113,6 +127,21 @@ export class ProductsService {
               },
             }),
       ]);
+
+      if (data.operation === "OUT") {
+        this.criticalStockAlertService.evaluateAfterStockChange(
+          {
+            id: product.id,
+            name: product.name,
+            quantity: product.quantity,
+            criticalStock: product.criticalStock,
+            stall: existing.stall,
+          },
+          oldQty,
+          product.quantity,
+        );
+      }
+
       return product;
     }
     return await this.prismaService.product.update({

@@ -1,4 +1,6 @@
-import { type PrismaClient, Role } from "../src/generated/prisma/client";
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient, Role } from "../src/generated/prisma/client";
 import {
   LEGACY_ROLE_SCREEN_KEYS,
   MANAGER_SCREEN_SEEDS,
@@ -77,4 +79,26 @@ export async function ensureRbacInfrastructure(prisma: PrismaClient) {
       });
     }
   }
+}
+
+async function main() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  const prisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString }),
+  });
+
+  try {
+    await ensureRbacInfrastructure(prisma);
+    console.log("RBAC atualizado com sucesso.");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+if (import.meta.main) {
+  void main();
 }

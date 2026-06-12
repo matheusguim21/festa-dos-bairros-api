@@ -225,8 +225,11 @@ export class ReportService {
     ws.getColumn("revenue").numFmt = "R$ #,##0.00";
   }
 
-  async getTotalRevenue() {
-    const result = await this.prisma.order.aggregate({ _sum: { total: true } });
+  async getTotalRevenue(stallId?: number) {
+    const result = await this.prisma.order.aggregate({
+      where: stallId ? { stallId } : undefined,
+      _sum: { total: true },
+    });
     return { totalRevenue: result._sum.total || 0 };
   }
 }

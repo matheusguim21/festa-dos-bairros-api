@@ -159,10 +159,46 @@ const stallsWithProducts: StallConfig[] = [
       { name: 'Açaí 400ml', price: 14.0, quantity: 30 },
     ],
   },
+  {
+    name: 'Sepetiba (FICHAS)',
+    username: 'sepetiba',
+    password: 'senha123',
+    products: [
+      { name: '2 reais', price: 2.0, quantity: 100 },
+      { name: '5 reais', price: 5.0, quantity: 100 },
+      { name: '10 reais', price: 10.0, quantity: 100 },
+      { name: '20 reais', price: 20.0, quantity: 100 },
+      { name: '30 reais', price: 30.0, quantity: 100 },
+      { name: '40 reais', price: 40.0, quantity: 100 },
+      { name: '50 reais', price: 50.0, quantity: 100 },
+      { name: '100 reais', price: 100.0, quantity: 100 },
+    ],
+  },
+  {
+    name: 'TIROLESA',
+    username: 'tirolesa',
+    password: 'senha123',
+    products: [
+      { name: 'Tirolesa', price: 15.0, quantity: 100 },
+      { name: 'Escalada', price: 10.0, quantity: 100 },
+      { name: 'Combo', price: 25.0, quantity: 100 },
+    ],
+  },
 ]
 
 async function main() {
   await ensureRbacInfrastructure(prisma)
+
+  await prisma.festaConfig.upsert({
+    where: { id: 1 },
+    create: {
+      id: 1,
+      festivalDay1: '2026-06-12',
+      festivalDay2: '2026-06-13',
+      criticalStockAlertsEnabled: true,
+    },
+    update: {},
+  })
 
   for (const stall of stallsWithProducts) {
     const hashedPassword = await hash(stall.password, 10)

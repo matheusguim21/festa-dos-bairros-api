@@ -100,6 +100,11 @@ export type Cashier = Prisma.CashierModel
  */
 export type TokenSale = Prisma.TokenSaleModel
 /**
+ * Model TokenSaleItem
+ * 
+ */
+export type TokenSaleItem = Prisma.TokenSaleItemModel
+/**
  * Model Sponsor
  * 
  */
@@ -119,3 +124,13 @@ export type FestaGalleryImage = Prisma.FestaGalleryImageModel
  * Configuração singleton do site (use id = 1)
  */
 export type FestaSiteConfig = Prisma.FestaSiteConfigModel
+/**
+ * Model FestaConfig
+ * Configuração operacional da festa (use id = 1)
+ */
+export type FestaConfig = Prisma.FestaConfigModel
+/**
+ * Model FestaAlertPhone
+ * 
+ */
+export type FestaAlertPhone = Prisma.FestaAlertPhoneModel

@@ -2,12 +2,39 @@ import 'dotenv/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../src/generated/prisma/client'
 import { readFile } from 'node:fs/promises'
-import { parseCardapioFb2026PdfBuffer } from '../src/infra/pdf/cardapio-fb-2026.parser'
+import {
+  type CardapioFb2026ParsedSection,
+  parseCardapioFb2026PdfBuffer,
+} from '../src/infra/pdf/cardapio-fb-2026.parser'
 import {
   buildStallResolverIndex,
   normalizeStallKey,
   resolveStallFromPdfLabel,
 } from '../src/infra/pdf/stall-resolver'
+
+const MANUAL_CARDAPIO_SECTIONS: CardapioFb2026ParsedSection[] = [
+  {
+    stallLabel: 'SEPETIBA',
+    items: [
+      { name: '2 reais', price: 2 },
+      { name: '5 reais', price: 5 },
+      { name: '10 reais', price: 10 },
+      { name: '20 reais', price: 20 },
+      { name: '30 reais', price: 30 },
+      { name: '40 reais', price: 40 },
+      { name: '50 reais', price: 50 },
+      { name: '100 reais', price: 100 },
+    ],
+  },
+  {
+    stallLabel: 'TIROLESA',
+    items: [
+      { name: 'Tirolesa', price: 15 },
+      { name: 'Escalada', price: 10 },
+      { name: 'Combo', price: 25 },
+    ],
+  },
+]
 
 function normalizeProductKey(s: string) {
   return s
@@ -52,7 +79,9 @@ async function main() {
     let matchedStalls = 0
     let skippedSections = 0
 
-    for (const section of parsed.sections) {
+    const allSections = [...parsed.sections, ...MANUAL_CARDAPIO_SECTIONS]
+
+    for (const section of allSections) {
       const normalizedLabel = normalizeStallKey(section.stallLabel)
       if (!includeBrincadeiras && normalizedLabel === 'brincadeiras') {
         skippedSections++

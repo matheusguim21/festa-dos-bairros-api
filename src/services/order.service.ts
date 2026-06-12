@@ -19,6 +19,7 @@ import type { PaymentConfirmedBody } from "@/utils/payment-hmac";
 import { verifyPaymentSignature } from "@/utils/payment-hmac";
 import { randomBytes } from "crypto";
 import { OrderStatus } from "@/generated/prisma/client";
+import { CriticalStockAlertService } from "@/services/critical-stock-alert.service";
 
 interface FindAllOrdersProps {
   search?: string;
@@ -34,6 +35,7 @@ export class OrderService {
     private stallService: StallService,
     private orderGateway: OrdersGateway,
     private configService: ConfigService<Env, true>,
+    private criticalStockAlertService: CriticalStockAlertService,
   ) {}
 
   async findAllOrders({ skip, take, search, stallId }: FindAllOrdersProps) {
@@ -100,6 +102,7 @@ export class OrderService {
       where: {
         id: { in: productsIds },
       },
+      include: { stall: true },
     });
 
     if (products.length !== items.length) {
@@ -155,7 +158,19 @@ export class OrderService {
         })),
       }),
     ]);
-    await this.orderGateway.emitOrdersToStall(stallId); // ✅
+    await this.orderGateway.emitOrdersToStall(stallId);
+
+    for (const item of items) {
+      const prod = products.find((p) => p.id === item.productId)!;
+      const oldQty = prod.quantity;
+      const newQty = oldQty - item.quantity;
+      this.criticalStockAlertService.evaluateAfterStockChange(
+        prod,
+        oldQty,
+        newQty,
+      );
+    }
+
     return order;
   }
   async updateStatus(orderId: number, dto: UpdateOrderStatusDto) {
@@ -369,6 +384,7 @@ export class OrderService {
 
     const products = await this.prismaService.product.findMany({
       where: { id: { in: order.items.map((i) => i.productId) } },
+      include: { stall: true },
     });
 
     if (products.length !== order.items.length) {
@@ -417,6 +433,17 @@ export class OrderService {
     });
 
     await this.orderGateway.emitOrdersToStall(order.stallId);
+
+    for (const item of order.items) {
+      const prod = products.find((p) => p.id === item.productId)!;
+      const oldQty = prod.quantity;
+      const newQty = oldQty - item.quantity;
+      this.criticalStockAlertService.evaluateAfterStockChange(
+        prod,
+        oldQty,
+        newQty,
+      );
+    }
 
     return { ok: true, orderId: order.id };
   }

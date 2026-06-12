@@ -63,10 +63,13 @@ export const ModelName = {
   StockOut: 'StockOut',
   Cashier: 'Cashier',
   TokenSale: 'TokenSale',
+  TokenSaleItem: 'TokenSaleItem',
   Sponsor: 'Sponsor',
   Attraction: 'Attraction',
   FestaGalleryImage: 'FestaGalleryImage',
-  FestaSiteConfig: 'FestaSiteConfig'
+  FestaSiteConfig: 'FestaSiteConfig',
+  FestaConfig: 'FestaConfig',
+  FestaAlertPhone: 'FestaAlertPhone'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -223,14 +226,30 @@ export type CashierScalarFieldEnum = (typeof CashierScalarFieldEnum)[keyof typeo
 
 export const TokenSaleScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   cashierId: 'cashierId',
   buyerName: 'buyerName',
-  amountPaid: 'amountPaid',
+  total: 'total',
+  paymentMethod: 'paymentMethod',
+  amountReceived: 'amountReceived',
+  changeAmount: 'changeAmount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type TokenSaleScalarFieldEnum = (typeof TokenSaleScalarFieldEnum)[keyof typeof TokenSaleScalarFieldEnum]
+
+
+export const TokenSaleItemScalarFieldEnum = {
+  id: 'id',
+  tokenSaleId: 'tokenSaleId',
+  fichaValue: 'fichaValue',
+  quantity: 'quantity',
+  unitPrice: 'unitPrice',
+  lineTotal: 'lineTotal'
+} as const
+
+export type TokenSaleItemScalarFieldEnum = (typeof TokenSaleItemScalarFieldEnum)[keyof typeof TokenSaleItemScalarFieldEnum]
 
 
 export const SponsorScalarFieldEnum = {
@@ -283,6 +302,30 @@ export const FestaSiteConfigScalarFieldEnum = {
 } as const
 
 export type FestaSiteConfigScalarFieldEnum = (typeof FestaSiteConfigScalarFieldEnum)[keyof typeof FestaSiteConfigScalarFieldEnum]
+
+
+export const FestaConfigScalarFieldEnum = {
+  id: 'id',
+  festivalDay1: 'festivalDay1',
+  festivalDay2: 'festivalDay2',
+  evolutionApiKey: 'evolutionApiKey',
+  evolutionInstanceName: 'evolutionInstanceName',
+  criticalStockAlertsEnabled: 'criticalStockAlertsEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FestaConfigScalarFieldEnum = (typeof FestaConfigScalarFieldEnum)[keyof typeof FestaConfigScalarFieldEnum]
+
+
+export const FestaAlertPhoneScalarFieldEnum = {
+  id: 'id',
+  phone: 'phone',
+  label: 'label',
+  createdAt: 'createdAt'
+} as const
+
+export type FestaAlertPhoneScalarFieldEnum = (typeof FestaAlertPhoneScalarFieldEnum)[keyof typeof FestaAlertPhoneScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -10,6 +10,8 @@ const seedStalls = [
   { id: 2, name: "Pingo D'água (BEBIDAS)" },
   { id: 3, name: '5 Marias (CHURRASCO)' },
   { id: 4, name: 'Jardim Guaratiba (CALDOS)' },
+  { id: 5, name: 'Sepetiba (FICHAS)' },
+  { id: 6, name: 'TIROLESA' },
 ]
 
 describe('resolveStallFromPdfLabel', () => {
@@ -26,6 +28,10 @@ describe('resolveStallFromPdfLabel', () => {
     expect(resolveStallFromPdfLabel(index, 'JARDIM GUARATIBA')?.name).toBe(
       'Jardim Guaratiba (CALDOS)',
     )
+    expect(resolveStallFromPdfLabel(index, 'SEPETIBA')?.name).toBe(
+      'Sepetiba (FICHAS)',
+    )
+    expect(resolveStallFromPdfLabel(index, 'TIROLESA')?.name).toBe('TIROLESA')
   })
 
   it('matches by normalized full name in database', () => {

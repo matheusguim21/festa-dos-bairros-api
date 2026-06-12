@@ -258,6 +258,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   stall?: Prisma.XOR<Prisma.StallNullableScalarRelationFilter, Prisma.StallWhereInput> | null
   appRole?: Prisma.XOR<Prisma.AppRoleNullableScalarRelationFilter, Prisma.AppRoleWhereInput> | null
+  tokenSales?: Prisma.TokenSaleListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -272,6 +273,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   stall?: Prisma.StallOrderByWithRelationInput
   appRole?: Prisma.AppRoleOrderByWithRelationInput
+  tokenSales?: Prisma.TokenSaleOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -289,6 +291,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   stall?: Prisma.XOR<Prisma.StallNullableScalarRelationFilter, Prisma.StallWhereInput> | null
   appRole?: Prisma.XOR<Prisma.AppRoleNullableScalarRelationFilter, Prisma.AppRoleWhereInput> | null
+  tokenSales?: Prisma.TokenSaleListRelationFilter
 }, "id" | "username">
 
 export type UserOrderByWithAggregationInput = {
@@ -332,6 +335,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   stall?: Prisma.StallCreateNestedOneWithoutUsersInput
   appRole?: Prisma.AppRoleCreateNestedOneWithoutUsersInput
+  tokenSales?: Prisma.TokenSaleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -344,6 +348,7 @@ export type UserUncheckedCreateInput = {
   appRoleId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tokenSales?: Prisma.TokenSaleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -355,6 +360,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   stall?: Prisma.StallUpdateOneWithoutUsersNestedInput
   appRole?: Prisma.AppRoleUpdateOneWithoutUsersNestedInput
+  tokenSales?: Prisma.TokenSaleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -367,6 +373,7 @@ export type UserUncheckedUpdateInput = {
   appRoleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenSales?: Prisma.TokenSaleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -458,6 +465,11 @@ export type UserListRelationFilter = {
 
 export type UserOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -572,6 +584,22 @@ export type UserUncheckedUpdateManyWithoutStallNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
+export type UserCreateNestedOneWithoutTokenSalesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTokenSalesInput, Prisma.UserUncheckedCreateWithoutTokenSalesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTokenSalesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutTokenSalesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTokenSalesInput, Prisma.UserUncheckedCreateWithoutTokenSalesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTokenSalesInput
+  upsert?: Prisma.UserUpsertWithoutTokenSalesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTokenSalesInput, Prisma.UserUpdateWithoutTokenSalesInput>, Prisma.UserUncheckedUpdateWithoutTokenSalesInput>
+}
+
 export type UserCreateWithoutAppRoleInput = {
   name: string
   username: string
@@ -580,6 +608,7 @@ export type UserCreateWithoutAppRoleInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   stall?: Prisma.StallCreateNestedOneWithoutUsersInput
+  tokenSales?: Prisma.TokenSaleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAppRoleInput = {
@@ -591,6 +620,7 @@ export type UserUncheckedCreateWithoutAppRoleInput = {
   stallId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tokenSales?: Prisma.TokenSaleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAppRoleInput = {
@@ -642,6 +672,7 @@ export type UserCreateWithoutStallInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   appRole?: Prisma.AppRoleCreateNestedOneWithoutUsersInput
+  tokenSales?: Prisma.TokenSaleCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStallInput = {
@@ -653,6 +684,7 @@ export type UserUncheckedCreateWithoutStallInput = {
   appRoleId?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tokenSales?: Prisma.TokenSaleUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStallInput = {
@@ -681,6 +713,68 @@ export type UserUpdateManyWithWhereWithoutStallInput = {
   data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutStallInput>
 }
 
+export type UserCreateWithoutTokenSalesInput = {
+  name: string
+  username: string
+  password: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  stall?: Prisma.StallCreateNestedOneWithoutUsersInput
+  appRole?: Prisma.AppRoleCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutTokenSalesInput = {
+  id?: number
+  name: string
+  username: string
+  password: string
+  role?: $Enums.Role
+  stallId?: number | null
+  appRoleId?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserCreateOrConnectWithoutTokenSalesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTokenSalesInput, Prisma.UserUncheckedCreateWithoutTokenSalesInput>
+}
+
+export type UserUpsertWithoutTokenSalesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTokenSalesInput, Prisma.UserUncheckedUpdateWithoutTokenSalesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTokenSalesInput, Prisma.UserUncheckedCreateWithoutTokenSalesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTokenSalesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTokenSalesInput, Prisma.UserUncheckedUpdateWithoutTokenSalesInput>
+}
+
+export type UserUpdateWithoutTokenSalesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stall?: Prisma.StallUpdateOneWithoutUsersNestedInput
+  appRole?: Prisma.AppRoleUpdateOneWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTokenSalesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  stallId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  appRoleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type UserCreateManyAppRoleInput = {
   id?: number
   name: string
@@ -700,6 +794,7 @@ export type UserUpdateWithoutAppRoleInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   stall?: Prisma.StallUpdateOneWithoutUsersNestedInput
+  tokenSales?: Prisma.TokenSaleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAppRoleInput = {
@@ -711,6 +806,7 @@ export type UserUncheckedUpdateWithoutAppRoleInput = {
   stallId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenSales?: Prisma.TokenSaleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutAppRoleInput = {
@@ -743,6 +839,7 @@ export type UserUpdateWithoutStallInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   appRole?: Prisma.AppRoleUpdateOneWithoutUsersNestedInput
+  tokenSales?: Prisma.TokenSaleUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStallInput = {
@@ -754,6 +851,7 @@ export type UserUncheckedUpdateWithoutStallInput = {
   appRoleId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenSales?: Prisma.TokenSaleUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutStallInput = {
@@ -768,6 +866,35 @@ export type UserUncheckedUpdateManyWithoutStallInput = {
 }
 
 
+/**
+ * Count Type UserCountOutputType
+ */
+
+export type UserCountOutputType = {
+  tokenSales: number
+}
+
+export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tokenSales?: boolean | UserCountOutputTypeCountTokenSalesArgs
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserCountOutputType
+   */
+  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTokenSalesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TokenSaleWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -781,6 +908,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   stall?: boolean | Prisma.User$stallArgs<ExtArgs>
   appRole?: boolean | Prisma.User$appRoleArgs<ExtArgs>
+  tokenSales?: boolean | Prisma.User$tokenSalesArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -827,6 +956,8 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   stall?: boolean | Prisma.User$stallArgs<ExtArgs>
   appRole?: boolean | Prisma.User$appRoleArgs<ExtArgs>
+  tokenSales?: boolean | Prisma.User$tokenSalesArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   stall?: boolean | Prisma.User$stallArgs<ExtArgs>
@@ -842,6 +973,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     stall: Prisma.$StallPayload<ExtArgs> | null
     appRole: Prisma.$AppRolePayload<ExtArgs> | null
+    tokenSales: Prisma.$TokenSalePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1249,6 +1381,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   stall<T extends Prisma.User$stallArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$stallArgs<ExtArgs>>): Prisma.Prisma__StallClient<runtime.Types.Result.GetResult<Prisma.$StallPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   appRole<T extends Prisma.User$appRoleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$appRoleArgs<ExtArgs>>): Prisma.Prisma__AppRoleClient<runtime.Types.Result.GetResult<Prisma.$AppRolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tokenSales<T extends Prisma.User$tokenSalesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tokenSalesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TokenSalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1723,6 +1856,30 @@ export type User$appRoleArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   include?: Prisma.AppRoleInclude<ExtArgs> | null
   where?: Prisma.AppRoleWhereInput
+}
+
+/**
+ * User.tokenSales
+ */
+export type User$tokenSalesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TokenSale
+   */
+  select?: Prisma.TokenSaleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TokenSale
+   */
+  omit?: Prisma.TokenSaleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TokenSaleInclude<ExtArgs> | null
+  where?: Prisma.TokenSaleWhereInput
+  orderBy?: Prisma.TokenSaleOrderByWithRelationInput | Prisma.TokenSaleOrderByWithRelationInput[]
+  cursor?: Prisma.TokenSaleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TokenSaleScalarFieldEnum | Prisma.TokenSaleScalarFieldEnum[]
 }
 
 /**
