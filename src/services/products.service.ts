@@ -4,6 +4,10 @@ import {
   UpdateProductRequest,
 } from "@/infra/http/controllers/products.controller";
 import { CriticalStockAlertService } from "@/services/critical-stock-alert.service";
+import {
+  accentInsensitiveNameSql,
+  normalizeSearchString,
+} from "@/utils/string-normalize";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Prisma } from "@/generated/prisma/client";
 
@@ -21,12 +25,37 @@ export class ProductsService {
   ) {}
 
   async findAllProducts({ skip, take, search, stallId }: FindAllProductsProps) {
+    let productIdsFromSearch: number[] | undefined;
+
+    if (search) {
+      const normalizedSearch = normalizeSearchString(search);
+      const stallFilter = stallId
+        ? Prisma.sql`AND p."stallId" = ${stallId}`
+        : Prisma.empty;
+
+      const rows = await this.prismaService.$queryRaw<{ id: number }[]>`
+        SELECT p.id
+        FROM "Product" p
+        WHERE ${accentInsensitiveNameSql('p."name"', normalizedSearch)}
+        ${stallFilter}
+      `;
+
+      productIdsFromSearch = rows.map((row) => row.id);
+
+      if (productIdsFromSearch.length === 0) {
+        return {
+          content: [],
+          totalElements: 0,
+          page: skip && take ? Math.floor(skip / take) : 0,
+          limit: take ?? 0,
+          totalPages: 0,
+        };
+      }
+    }
+
     const where: Prisma.ProductWhereInput = {
-      ...(search && {
-        name: {
-          contains: search,
-          mode: Prisma.QueryMode.insensitive,
-        },
+      ...(productIdsFromSearch !== undefined && {
+        id: { in: productIdsFromSearch },
       }),
       ...(stallId && { stallId }),
     };
