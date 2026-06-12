@@ -23,7 +23,8 @@
     "prisma:clear:bun": "bun run prisma/clear.ts",
     "postinstall": "bunx --bun prisma generate",
     "prisma:generate": "bunx --bun prisma generate",
-    "gallery:optimize": "bun run scripts/optimize-gallery-images.ts"
+    "gallery:optimize": "bun run scripts/optimize-gallery-images.ts",
+    "stress:test": "bun run scripts/stress-test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.1049.0",
