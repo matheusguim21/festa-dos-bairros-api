@@ -9,7 +9,7 @@ export const MANAGER_SCREEN_SEEDS: Array<{
 }> = [
   { key: "dashboard", pathSegment: "dashboard", label: "Dashboard", sortOrder: 5 },
   { key: "stall_order", pathSegment: "", label: "Venda", sortOrder: 10 },
-  { key: "pedidos_home", pathSegment: "", label: "Vendas (início)", sortOrder: 12 },
+  { key: "pedidos_home", pathSegment: "pedidos-home", label: "Vendas (início)", sortOrder: 12 },
   { key: "pedidos", pathSegment: "pedidos", label: "Pedidos", sortOrder: 20 },
   { key: "estoque", pathSegment: "estoque", label: "Estoque", sortOrder: 30 },
   { key: "preparar", pathSegment: "preparar", label: "Preparar pedidos", sortOrder: 35 },
